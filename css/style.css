@@ -63,3 +63,16 @@ h1{
 #p3{
     border: solid;
 }
+
+.col{
+    border: solid;
+    text-align: center;
+}
+
+.row{
+    border: solid;
+}
+
+label{
+    margin: 0 auto;
+}

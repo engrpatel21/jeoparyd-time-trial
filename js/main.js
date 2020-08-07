@@ -22,6 +22,10 @@ let GameData = (function () {
             .catch(err => {
                 console.log(err)
             })
+        },
+
+        hardCodedCategories: function () {
+            return hardCodedCategories
         }
     }
 
@@ -33,7 +37,8 @@ let GameUI = (function () {
         board: document.querySelector('.board'),
         categories: document.querySelectorAll('.category'),
         questions: document.querySelectorAll('.questions'),
-        players: document.querySelector('.players')
+        players: document.querySelector('.players'),
+        categorySelector: document.querySelector('.select-category')
     }
  
     return {
@@ -56,6 +61,9 @@ let GameController = (function (gD, gUI) {
         refs.board.onclick = (e) => {
             console.log(e.target.id)
             gD.fetchCategory(306)
+        }
+        refs.categorySelector.onclick = (e) => {
+            console.log(e.target.id)
         }
     }
 
