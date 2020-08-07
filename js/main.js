@@ -38,13 +38,22 @@ let GameUI = (function () {
         categories: document.querySelectorAll('.category'),
         questions: document.querySelectorAll('.questions'),
         players: document.querySelector('.players'),
-        categorySelector: document.querySelector('.select-category')
+        categorySelector: document.querySelectorAll('.select-category')
+    }
+
+    function newOps(arr) {
+        return arr.map(el => new Option(el[0],el[1]))
     }
  
     return {
         
         refs: function () {
             return cachedRef
+        },
+
+        addSelection: function (arr, category) {
+            newOps(arr).map((el, i) => category.add(el, i))
+            console.log(newOps(arr))
         }
 
     }
@@ -56,14 +65,17 @@ let GameUI = (function () {
 let GameController = (function (gD, gUI) { 
     
     const refs = gUI.refs();
-    console.log(refs.board)
+    const hardCodedCategories = gD.hardCodedCategories()
+    
+    refs.categorySelector.forEach(i => gUI.addSelection(hardCodedCategories, i))
+    console.log(refs.categorySelector)
     function setupEvents() {
         refs.board.onclick = (e) => {
             console.log(e.target.id)
             gD.fetchCategory(306)
         }
         refs.categorySelector.onclick = (e) => {
-            console.log(e.target.id)
+            console.log(e.target)
         }
     }
 
