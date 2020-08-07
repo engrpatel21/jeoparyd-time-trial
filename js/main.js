@@ -16,7 +16,7 @@ let GameData = (function () {
                 return response.json()
             })
             .then(data => {
-                let newQuestions = {}
+                gameVar.questions[category] = []
                 data.clues.forEach(i => {
                     
                     // newQuestions.questionID = i.id
