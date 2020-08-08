@@ -34,15 +34,61 @@ let GameData = (function () {
         emptyData: function (idx) {
             gameVar.questions[idx] = []
         },
-        cleanParentheses: function (idx1) {
+        cleanQuestions: function (idx, char) {
             let tempStr = ''
-            gameVar.questions[idx1].forEach( question => {
+            gameVar.questions[idx].forEach( question => {
                
-                tempStr = question.question.slice(question.question.indexOf(")", 2) + 1)
-                tempStr = tempStr.slice(tempStr.indexOf(')')+1)
+                tempStr = question.question.slice(question.question.indexOf(char, 2) + 1)
+                tempStr = tempStr.slice(tempStr.indexOf(char)+1)
                 question.question = tempStr.trim()
             })
             
+        },
+
+        cleanInvalidCharQs: function (idx) {
+            let tempStr = ''
+         
+            for (let i = 0; i < gameVar.questions[idx].length; i++) {
+                tempStr = ''
+                for (let j = 0; j < gameVar.questions[idx][i].question.length; j++){
+                    if (gameVar.questions[idx][i].question[j] === '') {
+                     
+                        tempStr += "'"
+                    }else if (gameVar.questions[idx][i].question[j] === '') {
+                        tempStr += '"'
+                    
+                    } else if (gameVar.questions[idx][i].question[j] === '') {
+                        tempStr += '"'
+                    }else {
+                        tempStr += gameVar.questions[idx][i].question[j]
+                    }
+                }
+             
+                gameVar.questions[idx][i].question = tempStr
+            }
+        },
+        cleanAnsewrs: function (idx) {
+            let tempStr = ''
+         
+            for (let i = 0; i < gameVar.questions[idx].length; i++) {
+                tempStr = ''
+                for (let j = 0; j < gameVar.questions[idx][i].answer.length; j++){
+                    if (gameVar.questions[idx][i].answer[j] === '') {
+                        tempStr += "'"
+                    }else if (gameVar.questions[idx][i].answer[j] === '') {
+                        tempStr += '"'
+                    
+                    } else if (gameVar.questions[idx][i].answer[j] === '') {
+                        tempStr += '"'
+                    } else if (gameVar.questions[idx][i].answer[j] === '\\') { 
+                        tempStr += ''
+                    }else {
+                        tempStr += gameVar.questions[idx][i].answer[j]
+                    }
+                }
+             
+                gameVar.questions[idx][i].answer = tempStr
+            }
         },
         
         // function to return the hard coded categories to be used by the app controller
@@ -126,10 +172,15 @@ let GameController = (function (gD, gUI) {
                  
                 } 
             })
-            gD.cleanParentheses(idx)
+            gD.cleanQuestions(idx, ')')
+            gD.cleanQuestions(idx, ']')
+            gD.cleanInvalidCharQs(idx)
+            gD.cleanAnsewrs(idx)
+            //gD.cleanBrackets(idx)
             refs.categories[idx].textContent = data.title
-            refs.questions[0].textContent = gameVars.questions[0][97].question
+            refs.questions[0].textContent = gameVars.questions[0][89].answer
             console.log(gameVars.pickedCategories)
+            console.log(gameVars.questions[idx].findIndex((el,i,arr) => arr[i].answer.includes('\\')))
             gD.print()
         })
         .catch(err => {
