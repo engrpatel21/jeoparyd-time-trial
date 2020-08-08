@@ -23,7 +23,7 @@ let GameData = (function () {
                 questionID: id,
                 categoryID: category_id,
                 category: title,
-                question: question, //.slice(question.indexOf(")",2)+1),
+                question: question, 
                 answer: answer,
                 invalid: invalid
             })
@@ -44,7 +44,40 @@ let GameData = (function () {
             })
             
         },
-
+        checkCategories: function (categories) {
+            let obj = {}
+            categories.forEach((category, idx) => {
+                if (!obj[category] && category !== null) obj[category] = [idx]
+                else if(category !== null) obj[category].push(idx)
+            });
+            return obj
+            
+        },
+        generateRandomQs: function (obj1, obj2) {
+            let qObj = {}
+            
+            for (let key in obj1) {
+                let numberQs = 5 * obj1[key].length
+                let qArr = []
+                console.log(numberQs)
+                console.log(qArr.length)
+                let i = 0;
+                let randomIdx;
+                while (qArr.length < numberQs) {
+                    randomIdx = Math.floor(Math.random() * obj2[obj1[key][0]].length)
+                    console.log(randomIdx)
+                    if (!qArr.includes(randomIdx)) {
+                        console.log(qArr)
+                        qArr.push(randomIdx)
+                    }
+                  
+                }
+                console.log(obj2[obj1[key][0]])
+                console.log(qArr)
+                qObj[key] = qArr
+            }
+            return qObj
+        },
         cleanInvalidCharQs: function (idx) {
             let tempStr = ''
          
@@ -168,20 +201,20 @@ let GameController = (function (gD, gUI) {
             data.clues.forEach(clue => {
                 if (clue.question.length > 1 && (!(clue.question.toLowerCase().includes('audio')) || !(clue.question.toLowerCase().includes('video'))) ) {
                     gD.getQuestionsData(idx, clue.id, clue.category_id, data.title, clue.question, clue.answer, clue.invalid_count) 
-                   
-                 
                 } 
             })
             gD.cleanQuestions(idx, ')')
             gD.cleanQuestions(idx, ']')
             gD.cleanInvalidCharQs(idx)
             gD.cleanAnsewrs(idx)
+            
+            console.log(gD.checkCategories(gameVars.pickedCategories))
+            console.log(gD.generateRandomQs(gD.checkCategories(gameVars.pickedCategories), gameVars.questions))
             //gD.cleanBrackets(idx)
             refs.categories[idx].textContent = data.title
             refs.questions[0].textContent = gameVars.questions[0][89].answer
-            console.log(gameVars.pickedCategories)
-            console.log(gameVars.questions[idx].findIndex((el,i,arr) => arr[i].answer.includes('\\')))
-            gD.print()
+            
+            
         })
         .catch(err => {
             console.log(err)
@@ -193,7 +226,7 @@ let GameController = (function (gD, gUI) {
 
         // event listener for the game board
         refs.board.onclick = (e) => {
-            
+            console.log(e.target.id)
         }
         
         // event listener for selecting categories 
@@ -201,7 +234,7 @@ let GameController = (function (gD, gUI) {
             
             // fetches data from the api depending on the user selected category
             fetchCategory(e.target.value, e.target.id[3])
-            console.log(gameVars.questions[0][12].question)
+           
         })
     }
 
@@ -209,7 +242,9 @@ let GameController = (function (gD, gUI) {
         // starts the game
         init: function () {
             console.log('start')
-            
+            refs.categorySelector.forEach((category,idx) => {
+                fetchCategory(category.value, idx )
+            })
             setupEvents();
         }
     }
