@@ -4,7 +4,7 @@
 let GameData = (function () {
     
     // hard coded categories to create options for html select element
-    const hardCodedCategories = [['Potpourriiii', 306], ['Stupid Answers', 136], ['Sports', 42], ['American History', 780], ['Animals', 21], ['3 Letter Words', 105], ['Science', 25], ['Transportation', 103], ['U.S. Cities', 7], ['People', 442], ['Television', 67], ['Hodgepodge', 227], ['State Capitals', 109], ['History', 114], ['The Bible', 31], ['Business & Industry', 31], ['U.S. Geography', 582], ['Annual Events', 1114], ['Common Bonds', 508], ['Food', 49], ['Rhyme Time', 561], ['Word Origins', 223], ['Pop Music', 770], ['Holidays & Observances', 662], ['Americana', 313], ['Food & Drink', 253], ['Weights & Measures', 420], ['Potent Potables', 83], ['Musical Instruments', 184], ['Bodies Of Water', 221], ['4 Letter Words', 51], ['Museums', 531], ['Nature', 267], ['Organizations', 357], ['World History', 530], ['Travel & Tourism', 369], ['Colleges & Universities', 672], ['Nonfiction', 793], ['World Capitals', 78], ['Literature', 574], ['Fruits & Vegetables', 777], ['Mythology', 680], ['U.S. History', 50], ['Religion', 99], ['The Movies', 309], ['First Ladies', 40], ['Fashion', 26], ['Homophones', 249], ['Quotations', 1420], ['Science & Nature', 218], ['Foreign Words & Phrases', 1145], ['Around The World', 1079], ['5 Letter Words', 139], ['Double Talk', 89], ['U.S. States', 17], ['Books & Authors', 197], ['Nursery Rhymes', 37], ['Brand Names', 2537], ['Familiar Phrases', 705], ['Before & After', 1800], ['Body Language', 897], ['Number, Please', 1195], ['The Old Testament', 128]]
+    const hardCodedCategories = [['Potpourriiii', 306], ['Stupid Answers', 136], ['Sports', 42], ['American History', 780], ['Animals', 21], ['3 Letter Words', 105], ['Science', 25], ['Transportation', 103], ['U.S. Cities', 7], ['People', 442], ['Television', 67], ['Hodgepodge', 227], ['State Capitals', 109], ['History', 114], ['The Bible', 31], ['Business & Industry', 176], ['U.S. Geography', 582], ['Annual Events', 1114], ['Common Bonds', 508], ['Food', 49], ['Rhyme Time', 561], ['Word Origins', 223], ['Holidays & Observances', 622], ['Americana', 313], ['Food & Drink', 253], ['Weights & Measures', 420], ['Potent Potables', 83], ['Musical Instruments', 184], ['Bodies Of Water', 211], ['4 Letter Words', 51], ['Museums', 539], ['Nature', 267], ['Organizations', 357], ['World History', 530], ['Travel & Tourism', 369], ['Colleges & Universities', 672], ['Nonfiction', 793], ['World Capitals', 78], ['Literature', 574], ['Fruits & Vegetables', 777], ['Mythology', 680], ['U.S. History', 50], ['Religion', 99], ['The Movies', 309], ['First Ladies', 41], ['Fashion', 26], ['Homophones', 249], ['Quotations', 1420], ['Science & Nature', 218], ['Foreign Words & Phrases', 1145], ['Around The World', 1079], ['5 Letter Words', 139], ['Double Talk', 89], ['U.S. States', 17], ['Books & Authors', 197], ['Nursery Rhymes', 37], ['Brand Names', 2537], ['Familiar Phrases', 705], ['Before & After', 1800], ['Body Language', 897], ['Number, Please', 1195], ['The Old Testament', 128]]
 
     
 
@@ -23,7 +23,7 @@ let GameData = (function () {
                 questionID: id,
                 categoryID: category_id,
                 category: title,
-                question: question,
+                question: question, //.slice(question.indexOf(")",2)+1),
                 answer: answer,
                 invalid: invalid
             })
@@ -33,6 +33,12 @@ let GameData = (function () {
         },
         emptyData: function (idx) {
             gameVar.questions[idx] = []
+        },
+        cleanParentheses: function (idx, str) {
+            let tempStr = str.slice(str.indexOf(")",2)+1)
+            //let tempStr = str.splice(str.indexOf(')', 2) + 1)
+            gameVar.questions[idx][0].question = null
+            //console.log(tempStr)
         },
         
         // function to return the hard coded categories to be used by the app controller
@@ -63,7 +69,7 @@ let GameUI = (function () {
         categorySelector: document.querySelectorAll('.select-category')
     }
 
-    // function that creates options to bused in html select element
+    // function that creates options to be used in html select element
     function newOps(arr) {
         return arr.map(el => new Option(el[0],el[1],true,false))
     }
@@ -78,8 +84,7 @@ let GameUI = (function () {
         addSelection: function (arr, category) {
             newOps(arr).map((el, i) => category.add(el, i))
 
-        },
-
+        }
 
     }
 
@@ -103,20 +108,22 @@ let GameController = (function (gD, gUI) {
     // sets the options for all the select elements using the hard coded categories
     refs.categorySelector.forEach(i => gUI.addSelection(hardCodedCategories, i))
 
-    function fetchCategory(categoryID, id) {
+    function fetchCategory(categoryID, idx) {
         fetch(`http://jservice.io/api/category?id=${categoryID}`)
         .then(response => {
             return response.json()
         })
         .then(data => {
-            gD.emptyData(id)
+            gD.emptyData(idx)
             data.clues.forEach(i => {
-              
-                gD.getQuestionsData(id, i.id, i.category_id, data.title, i.question, i.answer, i.invalid_count)
-                // function (idx, id, category_id, title, question, answer, invalid)
+                if (i.question.length > 1 && (!(i.question.toLowerCase().includes('audio')) || !(i.question.toLowerCase().includes('video'))) ) {
+                    gD.getQuestionsData(idx, i.id, i.category_id, data.title, i.question, i.answer, i.invalid_count) 
+                    gD.cleanParentheses(idx, i.question)
+                } 
             })
 
-            refs.categories[id].textContent = data.title
+            refs.categories[idx].textContent = data.title
+            refs.questions[0].textContent = gameVars.questions[0][97].question
             console.log(gameVars.pickedCategories)
             gD.print()
         })
@@ -138,7 +145,7 @@ let GameController = (function (gD, gUI) {
             
             // fetches data from the api depending on the user selected category
             fetchCategory(e.target.value, e.target.id[3])
-            
+            console.log(gameVars.questions[0][12].question)
         })
     }
 
