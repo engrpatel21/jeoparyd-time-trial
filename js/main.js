@@ -34,11 +34,15 @@ let GameData = (function () {
         emptyData: function (idx) {
             gameVar.questions[idx] = []
         },
-        cleanParentheses: function (idx, str) {
-            let tempStr = str.slice(str.indexOf(")",2)+1)
-            //let tempStr = str.splice(str.indexOf(')', 2) + 1)
-            gameVar.questions[idx][0].question = null
-            //console.log(tempStr)
+        cleanParentheses: function (idx1) {
+            let tempStr = ''
+            gameVar.questions[idx1].forEach( question => {
+               
+                tempStr = question.question.slice(question.question.indexOf(")", 2) + 1)
+                tempStr = tempStr.slice(tempStr.indexOf(')')+1)
+                question.question = tempStr.trim()
+            })
+            
         },
         
         // function to return the hard coded categories to be used by the app controller
@@ -115,13 +119,14 @@ let GameController = (function (gD, gUI) {
         })
         .then(data => {
             gD.emptyData(idx)
-            data.clues.forEach(i => {
-                if (i.question.length > 1 && (!(i.question.toLowerCase().includes('audio')) || !(i.question.toLowerCase().includes('video'))) ) {
-                    gD.getQuestionsData(idx, i.id, i.category_id, data.title, i.question, i.answer, i.invalid_count) 
-                    gD.cleanParentheses(idx, i.question)
+            data.clues.forEach(clue => {
+                if (clue.question.length > 1 && (!(clue.question.toLowerCase().includes('audio')) || !(clue.question.toLowerCase().includes('video'))) ) {
+                    gD.getQuestionsData(idx, clue.id, clue.category_id, data.title, clue.question, clue.answer, clue.invalid_count) 
+                   
+                 
                 } 
             })
-
+            gD.cleanParentheses(idx)
             refs.categories[idx].textContent = data.title
             refs.questions[0].textContent = gameVars.questions[0][97].question
             console.log(gameVars.pickedCategories)
