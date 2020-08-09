@@ -47,33 +47,23 @@ let GameData = (function () {
         checkCategories: function (categories) {
             let obj = {}
             categories.forEach((category, idx) => {
-                if (!obj[category] && category !== null) obj[category] = [idx]
-                else if(category !== null) obj[category].push(idx)
+                if (!obj[idx] && category !== null) obj[idx] = category
             });
             return obj
             
         },
-        generateRandomQs: function (obj1, obj2) {
+        generateRandomQs: function (categories, questions) {
             let qObj = {}
-            
-            for (let key in obj1) {
-                let numberQs = 5 * obj1[key].length
+            for (let key in categories) {
                 let qArr = []
-                console.log(numberQs)
-                console.log(qArr.length)
-                let i = 0;
                 let randomIdx;
-                while (qArr.length < numberQs) {
-                    randomIdx = Math.floor(Math.random() * obj2[obj1[key][0]].length)
-                    console.log(randomIdx)
+                while (qArr.length < 5) {
+                    randomIdx = Math.floor(Math.random() * questions[key].length)
                     if (!qArr.includes(randomIdx)) {
-                        console.log(qArr)
                         qArr.push(randomIdx)
                     }
                   
                 }
-                console.log(obj2[obj1[key][0]])
-                console.log(qArr)
                 qObj[key] = qArr
             }
             return qObj
@@ -149,7 +139,13 @@ let GameUI = (function () {
         categories: document.querySelectorAll('.category'),
         questions: document.querySelectorAll('.questions'),
         players: document.querySelector('.players'),
-        categorySelector: document.querySelectorAll('.select-category')
+        categorySelector: document.querySelectorAll('.select-category'),
+        col0: document.querySelectorAll('.col0'),
+        col1: document.querySelectorAll('.col1'),
+        col2: document.querySelectorAll('.col2'),
+        col3: document.querySelectorAll('.col3'),
+        col4: document.querySelectorAll('.col4'),
+        col5: document.querySelectorAll('.col5')
     }
 
     // function that creates options to be used in html select element
@@ -167,6 +163,18 @@ let GameUI = (function () {
         addSelection: function (arr, category) {
             newOps(arr).map((el, i) => category.add(el, i))
 
+        },
+        renderInit: function (idx, categoryArray, obj, obj2) {
+            cachedRef.categories[idx].textContent = categoryArray[idx]
+            let arr = []
+            cachedRef.col0.forEach((el, i) => {
+                //console.log(categoryArray[i])
+                //console.log(obj[0][obj2[categoryArray[i]].shift()].question)
+                
+                el.textContent = obj[0][obj2[categoryArray[i]].shift()].question
+                console.log(obj2)
+            })
+        //    console.log(arr)
         }
 
     }
@@ -186,7 +194,6 @@ let GameController = (function (gD, gUI) {
 
     // cached references pulled from the gameUI
     const refs = gUI.refs();
-    
 
     // sets the options for all the select elements using the hard coded categories
     refs.categorySelector.forEach(i => gUI.addSelection(hardCodedCategories, i))
@@ -199,7 +206,8 @@ let GameController = (function (gD, gUI) {
         .then(data => {
             gD.emptyData(idx)
             data.clues.forEach(clue => {
-                if (clue.question.length > 1 && (!(clue.question.toLowerCase().includes('audio')) || !(clue.question.toLowerCase().includes('video'))) ) {
+                if (clue.question.length > 1
+                    && (!(clue.question.toLowerCase().includes('audio')) ||!(clue.question.toLowerCase().includes('video')))) {
                     gD.getQuestionsData(idx, clue.id, clue.category_id, data.title, clue.question, clue.answer, clue.invalid_count) 
                 } 
             })
@@ -207,14 +215,14 @@ let GameController = (function (gD, gUI) {
             gD.cleanQuestions(idx, ']')
             gD.cleanInvalidCharQs(idx)
             gD.cleanAnsewrs(idx)
-            
-            console.log(gD.checkCategories(gameVars.pickedCategories))
-            console.log(gD.generateRandomQs(gD.checkCategories(gameVars.pickedCategories), gameVars.questions))
-            //gD.cleanBrackets(idx)
-            refs.categories[idx].textContent = data.title
-            refs.questions[0].textContent = gameVars.questions[0][89].answer
-            
-            
+            let checkedCategories = gD.checkCategories(gameVars.pickedCategories) 
+            let generatedQuestions = gD.generateRandomQs(checkedCategories, gameVars.questions)
+            console.log(checkedCategories)
+            console.log(generatedQuestions)
+            ///gUI.renderInit(idx, gameVars.pickedCategories, gameVars.questions, generatedQuestions)
+            //refs.categories[idx].textContent = gameVars.pickedCategories[idx]
+          
+           
         })
         .catch(err => {
             console.log(err)
@@ -245,6 +253,7 @@ let GameController = (function (gD, gUI) {
             refs.categorySelector.forEach((category,idx) => {
                 fetchCategory(category.value, idx )
             })
+            
             setupEvents();
         }
     }
