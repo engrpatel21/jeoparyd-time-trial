@@ -14,7 +14,9 @@ let GameData = (function () {
         questions: [[],[],[],[],[],[]],//each nested array represents 1 of 6 categories to choose from
         playerNames: [], // player names
         playerScores: [], //player scores
-        questionTimer: null // timer variable 
+        questionTimer: null,
+        generatedQuestions: null,
+        checkCategories: null
     }
     return {
 
@@ -54,18 +56,28 @@ let GameData = (function () {
         },
         generateRandomQs: function (categories, questions) {
             let qObj = {}
+            let commQsArr = []
+            let prevCat = []
             for (let key in categories) {
                 let qArr = []
                 let randomIdx;
+                prevCat.push(categories[key])
                 while (qArr.length < 5) {
                     randomIdx = Math.floor(Math.random() * questions[key].length)
-                    if (!qArr.includes(randomIdx)) {
+
+                    if (prevCat.includes(categories[key])) {
+                        if (!qArr.includes(randomIdx) && !commQsArr.includes(randomIdx)) {
+                            commQsArr.push(randomIdx)
+                            qArr.push(randomIdx)
+                        }
+                    }else if (!qArr.includes(randomIdx)) {
                         qArr.push(randomIdx)
                     }
-                  
                 }
                 qObj[key] = qArr
             }
+            commQsArr = []
+            prevCat = []
             return qObj
         },
         cleanInvalidCharQs: function (idx) {
@@ -164,17 +176,28 @@ let GameUI = (function () {
             newOps(arr).map((el, i) => category.add(el, i))
 
         },
-        renderInit: function (idx, categoryArray, obj, obj2) {
+        renderInit: function (idx, categoryArray, questionsData, rGQuestions) {
             cachedRef.categories[idx].textContent = categoryArray[idx]
             let arr = []
             cachedRef.col0.forEach((el, i) => {
-                //console.log(categoryArray[i])
-                //console.log(obj[0][obj2[categoryArray[i]].shift()].question)
-                
-                el.textContent = obj[0][obj2[categoryArray[i]].shift()].question
-                console.log(obj2)
+                el.textContent = questionsData[0][rGQuestions[0][i]].question
             })
-        //    console.log(arr)
+            cachedRef.col1.forEach((el, i) => {
+                el.textContent = questionsData[1][rGQuestions[1][i]].question
+            })
+            cachedRef.col2.forEach((el, i) => {
+                el.textContent = questionsData[2][rGQuestions[2][i]].question
+            })
+            cachedRef.col3.forEach((el, i) => {
+                el.textContent = questionsData[3][rGQuestions[3][i]].question
+            })
+            cachedRef.col4.forEach((el, i) => {
+                el.textContent = questionsData[4][rGQuestions[4][i]].question
+            })
+            cachedRef.col5.forEach((el, i) => {
+                el.textContent = questionsData[5][rGQuestions[5][i]].question
+            })
+      
         }
 
     }
@@ -215,12 +238,10 @@ let GameController = (function (gD, gUI) {
             gD.cleanQuestions(idx, ']')
             gD.cleanInvalidCharQs(idx)
             gD.cleanAnsewrs(idx)
-            let checkedCategories = gD.checkCategories(gameVars.pickedCategories) 
-            let generatedQuestions = gD.generateRandomQs(checkedCategories, gameVars.questions)
-            console.log(checkedCategories)
-            console.log(generatedQuestions)
-            ///gUI.renderInit(idx, gameVars.pickedCategories, gameVars.questions, generatedQuestions)
-            //refs.categories[idx].textContent = gameVars.pickedCategories[idx]
+            gameVars.checkedCategories = gD.checkCategories(gameVars.pickedCategories) 
+            gameVars.generatedQuestions = gD.generateRandomQs(gameVars.checkedCategories, gameVars.questions)
+            gUI.renderInit(idx, gameVars.pickedCategories, gameVars.questions, gameVars.generatedQuestions)
+           
           
            
         })
@@ -235,6 +256,8 @@ let GameController = (function (gD, gUI) {
         // event listener for the game board
         refs.board.onclick = (e) => {
             console.log(e.target.id)
+            console.log(e.target.className[5])
+            console.log(gameVars.questions[e.target.className[3]][gameVars.generatedQuestions[e.target.className[3]][e.target.className[5]]].answergit)
         }
         
         // event listener for selecting categories 
