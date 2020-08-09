@@ -54,6 +54,16 @@ let GameData = (function () {
             return obj
             
         },
+        finalClean: function (arr, idx) {
+            arr[idx].forEach((el, i) => {
+                if (el.question === '') {
+
+                 
+                    arr[idx].splice(i,1)
+                
+                }
+            })
+        },
         generateRandomQs: function (categories, questions) {
             let qObj = {}
             let commQsArr = []
@@ -178,23 +188,26 @@ let GameUI = (function () {
         },
         renderInit: function (idx, categoryArray, questionsData, rGQuestions) {
             cachedRef.categories[idx].textContent = categoryArray[idx]
-            let arr = []
+        
             cachedRef.col0.forEach((el, i) => {
                 el.textContent = questionsData[0][rGQuestions[0][i]].question
             })
             cachedRef.col1.forEach((el, i) => {
-                el.textContent = questionsData[1][rGQuestions[1][i]].question
+              
+                 el.textContent = questionsData[1][rGQuestions[1][i]].question
             })
             cachedRef.col2.forEach((el, i) => {
-                el.textContent = questionsData[2][rGQuestions[2][i]].question
+                
+                 el.textContent = questionsData[2][rGQuestions[2][i]].question
             })
             cachedRef.col3.forEach((el, i) => {
                 el.textContent = questionsData[3][rGQuestions[3][i]].question
             })
             cachedRef.col4.forEach((el, i) => {
-                el.textContent = questionsData[4][rGQuestions[4][i]].question
+                 el.textContent = questionsData[4][rGQuestions[4][i]].question
             })
             cachedRef.col5.forEach((el, i) => {
+                
                 el.textContent = questionsData[5][rGQuestions[5][i]].question
             })
       
@@ -229,8 +242,8 @@ let GameController = (function (gD, gUI) {
         .then(data => {
             gD.emptyData(idx)
             data.clues.forEach(clue => {
-                if (clue.question.length > 1
-                    && (!(clue.question.toLowerCase().includes('audio')) ||!(clue.question.toLowerCase().includes('video')))) {
+                if ((clue.question.length > 3 )
+                    && (!(clue.question.toLowerCase().includes('audio')) || !(clue.question.toLowerCase().includes('video')))) {
                     gD.getQuestionsData(idx, clue.id, clue.category_id, data.title, clue.question, clue.answer, clue.invalid_count) 
                 } 
             })
@@ -240,13 +253,16 @@ let GameController = (function (gD, gUI) {
             gD.cleanAnsewrs(idx)
             gameVars.checkedCategories = gD.checkCategories(gameVars.pickedCategories) 
             gameVars.generatedQuestions = gD.generateRandomQs(gameVars.checkedCategories, gameVars.questions)
-            gUI.renderInit(idx, gameVars.pickedCategories, gameVars.questions, gameVars.generatedQuestions)
-           
-          
+            gD.finalClean(gameVars.questions, idx)
+            //console.log(gameVars.questions[idx].findIndex((el,i,arr) => arr[i].question === ""))
+            // console.log(gameVars.questions[idx][187])
            
         })
-        .catch(err => {
-            console.log(err)
+            .then(() => {
+                gUI.renderInit(idx, gameVars.pickedCategories, gameVars.questions, gameVars.generatedQuestions)
+         })
+         .catch(err => {
+             console.log(err)
         })
     }
 
@@ -255,9 +271,7 @@ let GameController = (function (gD, gUI) {
 
         // event listener for the game board
         refs.board.onclick = (e) => {
-            console.log(e.target.id)
-            console.log(e.target.className[5])
-            console.log(gameVars.questions[e.target.className[3]][gameVars.generatedQuestions[e.target.className[3]][e.target.className[5]]].answergit)
+            console.log(gameVars.questions[e.target.className[3]][gameVars.generatedQuestions[e.target.className[3]][e.target.className[5]]].answer)
         }
         
         // event listener for selecting categories 
@@ -265,6 +279,8 @@ let GameController = (function (gD, gUI) {
             
             // fetches data from the api depending on the user selected category
             fetchCategory(e.target.value, e.target.id[3])
+
+          
            
         })
     }
