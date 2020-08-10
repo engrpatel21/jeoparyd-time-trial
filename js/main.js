@@ -15,7 +15,14 @@ let GameData = (function () {
         playerNames: [], // player names
         playerScores: [], //player scores
         questionTimer: null,
-        generatedQuestions: null,
+        generatedQuestions: {
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+            4: [],
+            5: []
+        },
         checkCategories: null
     }
     return {
@@ -64,18 +71,19 @@ let GameData = (function () {
                 }
             })
         },
-        generateRandomQs: function (categories, questions) {
-            let qObj = []
+
+
+        generateRandomQs: function (categories, questions,idx, generatedQuestions) {
             let commQsArr = []
             let prevCat = []
-            for (let key in categories) {
+            
                 let qArr = []
                 let randomIdx;
-                prevCat.push(categories[key])
+                prevCat.push(categories[idx])
                 while (qArr.length < 5) {
-                    randomIdx = Math.floor(Math.random() * questions[key].length)
+                    randomIdx = Math.floor(Math.random() * questions[idx].length)
 
-                    if (prevCat.includes(categories[key])) {
+                    if (prevCat.includes(categories[idx])) {
                         if (!qArr.includes(randomIdx) && !commQsArr.includes(randomIdx)) {
                             commQsArr.push(randomIdx)
                             qArr.push(randomIdx)
@@ -84,11 +92,8 @@ let GameData = (function () {
                         qArr.push(randomIdx)
                     }
                 }
-                qObj[key] = qArr
-            }
-            commQsArr = []
-            prevCat = []
-            return qObj
+                generatedQuestions[idx] = qArr
+            return generatedQuestions
         },
         cleanInvalidCharQs: function (idx) {
             let tempStr = ''
@@ -185,7 +190,14 @@ let GameUI = (function () {
         col5: document.querySelectorAll('.col5'),
         submit: document.getElementById('submit-btn'),
         categorySelectorContainer: document.querySelector('.category-container'),
-        reset: document.getElementById('reset-btn')
+        reset: document.getElementById('reset-btn'),
+        p0Name: document.getElementById('plyr0-name'),
+        p1Name: document.getElementById('plyr1-name'),
+        p2Name: document.getElementById('plyr2-name'),
+        p0btn: document.getElementById('plyr0-btn'),
+        p1btn: document.getElementById('plyr1-btn'),
+        p2btn: document.getElementById('plyr2-btn'),
+        
     }
 
 
@@ -211,30 +223,30 @@ let GameUI = (function () {
             if (idx == 0) {
                 console.log(idx)
                 cachedRef.col0.forEach((el, i) => {
-                    el.textContent = questionsData[idx][rGQuestions[idx][i]].question
+                    el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
                 })
             }else if (idx == 1) {
                 cachedRef.col1.forEach((el, i) => {
               
-                    el.textContent = questionsData[idx][rGQuestions[idx][i]].question
+                    el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
                 })
             } else if (idx == 2) {
                 cachedRef.col2.forEach((el, i) => {
                 
-                    el.textContent = questionsData[idx][rGQuestions[idx][i]].question
+                    el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
                 })
             }else if (idx == 3) {
                 cachedRef.col3.forEach((el, i) => {
-                    el.textContent = questionsData[idx][rGQuestions[idx][i]].question
+                    el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
                 })
             }else if (idx == 4) {
                 cachedRef.col4.forEach((el, i) => {
-                    el.textContent = questionsData[idx][rGQuestions[idx][i]].question
+                    el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
                 })
             }else if (idx == 5) {
                 cachedRef.col5.forEach((el, i) => {
                 
-                    el.textContent = questionsData[idx][rGQuestions[idx][i]].question
+                    el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
                 })
             }
       
@@ -262,10 +274,10 @@ let GameController = (function (gD, gUI) {
     refs.categorySelector.forEach(i => gUI.addSelection(hardCodedCategories, i))
 
     function fetchCategory(categoryID, idx) {
-        console.log('begining of fetc',idx)
+     
             fetch(`http://jservice.io/api/category?id=${categoryID}`)
                 .then(response => {
-                    console.log('then',idx)
+                   
                     // console.log(response)
                     return response.json()
                 })
@@ -283,30 +295,50 @@ let GameController = (function (gD, gUI) {
                     gD.cleanInvalidCharQs(idx)
                     gD.cleanAnsewrs(idx)
                     gameVars.checkedCategories = gD.checkCategories(gameVars.pickedCategories)
-                    gameVars.generatedQuestions = gD.generateRandomQs(gameVars.checkedCategories, gameVars.questions)
+                    gameVars.generatedQuestions = gD.generateRandomQs(gameVars.checkedCategories, gameVars.questions, idx, gameVars.generatedQuestions)
                     gD.finalClean(gameVars.questions, idx)
+                    console.log(gameVars.generatedQuestions)
                     // console.log(gameVars.questions)
                     // console.log(gameVars.pickedCategories)
                     // console.log(gameVars.generatedQuestions)
                     //console.log(gameVars.questions[idx].findIndex((el,i,arr) => arr[i].question === ""))
                     // console.log(gameVars.questions[idx][187])
+               
+
            
                 })
                 .then(() => {
                     gD.fixFormat(gameVars.pickedCategories, idx)
                     gUI.renderInit(idx, gameVars.pickedCategories, gameVars.questions, gameVars.generatedQuestions)
                 })
-                .catch(err => {
-                    console.log(err)
-                })
+                // .catch(err => {
+                //     console.log(err)
+                // })
         
     }
 
     // this function runs all the event listeners 
     function setupEvents() {
 
+        refs.p0btn.onclick = (e) => {
+        
+            gameVars.playerNames[0] = refs.p0Name.value
+            console.log(gameVars.playerNames)
+        }
+        refs.p1btn.onclick = (e) => {
+          
+            gameVars.playerNames[1] = refs.p1Name.value
+            console.log(gameVars.playerNames)
+        }
+        refs.p2btn.onclick = (e) => {
+         
+            gameVars.playerNames[2] = refs.p2Name.value
+            console.log(gameVars.playerNames)
+        }
+
         // event listener for the game board
         refs.board.onclick = (e) => {
+            console.log(gameVars.generatedQuestions)
             console.log(gameVars.questions[e.target.className[3]][gameVars.generatedQuestions[e.target.className[3]][e.target.className[5]]].answer)
         }
         
@@ -318,13 +350,16 @@ let GameController = (function (gD, gUI) {
             if (e.target.value != -1) { 
                 fetchCategory(e.target.value, e.target.id[3])
             }
+           
         })
 
         refs.submit.onclick = (e) => {
-            refs.board.style.display = ''
-            refs.categorySelectorContainer.style.display = 'none'
-            refs.reset.style.display = ''
-            refs.submit.style.display = 'none'
+            if (gameVars.pickedCategories.length === 6 && gameVars.playerNames.length === 3) {
+                refs.board.style.display = ''
+                refs.categorySelectorContainer.style.display = 'none'
+                refs.reset.style.display = ''
+                refs.submit.style.display = 'none'
+            }
         }  
         refs.reset.onclick = (e) => {
             refs.board.style.display = 'none'
