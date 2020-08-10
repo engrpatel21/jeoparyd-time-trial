@@ -197,6 +197,10 @@ let GameUI = (function () {
         p0btn: document.getElementById('plyr0-btn'),
         p1btn: document.getElementById('plyr1-btn'),
         p2btn: document.getElementById('plyr2-btn'),
+        score0: document.getElementById('sp0'),
+        score1: document.getElementById('sp1'),
+        score3: document.getElementById('sp3'),
+        scores: document.querySelectorAll('score')
         
     }
 
