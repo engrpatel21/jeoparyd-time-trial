@@ -220,36 +220,40 @@ let GameUI = (function () {
         renderInit: function (idx, categoryArray, questionsData, rGQuestions) {
             cachedRef.categories[idx].textContent = categoryArray[idx]
             console.log('render', idx)
-            if (idx == 0) {
-                console.log(idx)
-                cachedRef.col0.forEach((el, i) => {
-                    el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
-                })
-            }else if (idx == 1) {
-                cachedRef.col1.forEach((el, i) => {
+            // if (idx == 0) {
+            //     console.log(idx)
+            //     cachedRef.col0.forEach((el, i) => {
+            //         el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
+            //     })
+            // }else if (idx == 1) {
+            //     cachedRef.col1.forEach((el, i) => {
               
-                    el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
-                })
-            } else if (idx == 2) {
-                cachedRef.col2.forEach((el, i) => {
+            //         el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
+            //     })
+            // } else if (idx == 2) {
+            //     cachedRef.col2.forEach((el, i) => {
                 
-                    el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
-                })
-            }else if (idx == 3) {
-                cachedRef.col3.forEach((el, i) => {
-                    el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
-                })
-            }else if (idx == 4) {
-                cachedRef.col4.forEach((el, i) => {
-                    el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
-                })
-            }else if (idx == 5) {
-                cachedRef.col5.forEach((el, i) => {
+            //         el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
+            //     })
+            // }else if (idx == 3) {
+            //     cachedRef.col3.forEach((el, i) => {
+            //         el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
+            //     })
+            // }else if (idx == 4) {
+            //     cachedRef.col4.forEach((el, i) => {
+            //         el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
+            //     })
+            // }else if (idx == 5) {
+            //     cachedRef.col5.forEach((el, i) => {
                 
-                    el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
-                })
-            }
+            //         el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
+            //     })
+            // }
       
+        },
+        renderQ: function (question, colIdx, qIdx, questions, generatedQuestions) {
+            question.textContent = questions[colIdx][generatedQuestions[colIdx][qIdx]].question
+            
         }
 
     }
@@ -338,8 +342,10 @@ let GameController = (function (gD, gUI) {
 
         // event listener for the game board
         refs.board.onclick = (e) => {
-            console.log(gameVars.generatedQuestions)
-            console.log(gameVars.questions[e.target.className[3]][gameVars.generatedQuestions[e.target.className[3]][e.target.className[5]]].answer)
+            let colIdx = e.target.className[3]
+            let qIdx = e.target.className[5]
+            console.log(gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer)
+            gUI.renderQ(e.target, colIdx, qIdx, gameVars.questions, gameVars.generatedQuestions)
         }
         
         // event listener for selecting categories 
