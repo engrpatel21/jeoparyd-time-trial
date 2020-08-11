@@ -73,7 +73,6 @@ let GameData = (function () {
 
         generateRandomQs: function (questions, idx, generatedQuestions) {
             let qArr = []
-            console.log(idx)
             let randomIdx;
             let valueLow = 100;
             let valueHigh = 200;
@@ -191,8 +190,10 @@ let GameUI = (function () {
         reset: document.getElementById('reset-btn'),
         p0Name: document.getElementById('plyr0-name'),
         p0btn: document.getElementById('plyr0-btn'),
-        score0: document.getElementById('sp0'),
-        time: document.getElementById('time')
+        score: document.getElementById('score'),
+        time: document.getElementById('time'),
+        name: document.getElementById('name'),
+        answer: document.getElementById('answer')
     }
 
 
@@ -220,6 +221,9 @@ let GameUI = (function () {
             question.textContent = questions[colIdx][generatedQuestions[colIdx][qIdx]].question
             
         },
+
+     
+        
         renderTime: function (hr, min, sec) {
             cachedRef.time.textContent = `Time: ${hr}:${min}:${sec}`
         }
@@ -315,7 +319,15 @@ let GameController = (function (gD, gUI) {
  
     function startTimer() {
         clearInterval(timerInterval)
-        timerInterval = setInterval(tick, 100)
+        timerInterval = setInterval(tick, 2000)
+    }
+
+    function checkAnswer(colIdx, qIdx) {
+        console.log('check', colIdx, qIdx)
+        console.log(gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer)
+        if (refs.answer.value === gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer) {
+            refs.score.textContent = gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].value
+        }
     }
 
     // this function runs all the event listeners 
@@ -332,8 +344,8 @@ let GameController = (function (gD, gUI) {
         refs.board.onclick = (e) => {
             let colIdx = e.target.className[3]
             let qIdx = e.target.className[5]
-                // console.log(gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer)
-            console.log(e.target)
+            console.log(gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer)
+           
             gUI.renderQ(e.target, colIdx, qIdx, gameVars.questions, gameVars.generatedQuestions)
         }
         
@@ -348,12 +360,21 @@ let GameController = (function (gD, gUI) {
            
         })
 
+        refs.answer.addEventListener('keypress', (e) => {
+            if(event.key === 13 || event.which == 13){
+                console.log(e.target.value)
+                checkAnswer(colIdx,qIdx)
+                e.target.value = ''
+            }
+        })
+
         refs.submit.onclick = (e) => {
             if (gameVars.pickedCategories.length === 6 && gameVars.playerNames.length === 1) {
                 refs.board.style.display = ''
                 refs.categorySelectorContainer.style.display = 'none'
                 refs.reset.style.display = ''
                 refs.submit.style.display = 'none'
+                refs.name.textContent = gameVars.playerNames[0]
                 startTimer()
             }
             
