@@ -13,7 +13,7 @@ let GameData = (function () {
         pickedCategories: [], //categories that were picked
         questions: [[],[],[],[],[],[]],//each nested array represents 1 of 6 categories to choose from
         playerNames: [], // player names
-        playerScores: [], //player scores
+        playerScore: 0, //player scores
         timeInterval: null,
         clock: 0,
         generatedQuestions: {
@@ -193,7 +193,8 @@ let GameUI = (function () {
         score: document.getElementById('score'),
         time: document.getElementById('time'),
         name: document.getElementById('name'),
-        answer: document.getElementById('answer')
+        answer: document.getElementById('answer'), 
+        playerNameSetting: document.querySelector('.players')
     }
 
 
@@ -297,10 +298,10 @@ let GameController = (function (gD, gUI) {
         if (sec === 0) {
             clearInterval(timerInterval)
         }
-
+        gUI.renderQ(refs.questions[idx], colIdx, qIdx, gameVars.questions, gameVars.generatedQuestions)
         gUI.renderTime(hr, min, sec)
         if (sec % 10 === 0) {
-            gUI.renderQ(refs.questions[idx], colIdx, qIdx, gameVars.questions, gameVars.generatedQuestions)
+            
             
             colIdx++;
             
@@ -326,7 +327,8 @@ let GameController = (function (gD, gUI) {
         console.log('check', colIdx, qIdx)
         console.log(gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer)
         if (refs.answer.value === gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer) {
-            refs.score.textContent = gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].value
+            gameVars.playerScore += gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].value
+            refs.score.textContent = gameVars.playerScore
         }
     }
 
@@ -375,6 +377,7 @@ let GameController = (function (gD, gUI) {
                 refs.reset.style.display = ''
                 refs.submit.style.display = 'none'
                 refs.name.textContent = gameVars.playerNames[0]
+                refs.playerNameSetting.style.display = 'none'
                 startTimer()
             }
             
