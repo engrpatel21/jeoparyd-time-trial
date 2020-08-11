@@ -14,7 +14,8 @@ let GameData = (function () {
         questions: [[],[],[],[],[],[]],//each nested array represents 1 of 6 categories to choose from
         playerNames: [], // player names
         playerScores: [], //player scores
-        questionTimer: null,
+        timeInterval: null,
+        clock: 0,
         generatedQuestions: {
             0: [],
             1: [],
@@ -27,14 +28,14 @@ let GameData = (function () {
     }
     return {
 
-        getQuestionsData: function (idx, id, category_id, title, question, answer, invalid) {
+        getQuestionsData: function (idx, id, category_id, title, question, answer, value) {
             gameVar.questions[idx].push({
                 questionID: id,
                 categoryID: category_id,
                 category: title,
                 question: question, 
                 answer: answer,
-                invalid: invalid
+                value: value
             })
             gameVar.pickedCategories[idx] = title
            
@@ -64,40 +65,32 @@ let GameData = (function () {
         finalClean: function (arr, idx) {
             arr[idx].forEach((el, i) => {
                 if (el.question === '') {
-
-                 
                     arr[idx].splice(i,1)
-                
                 }
             })
         },
 
 
-        generateRandomQs: function (categories, questions,idx, generatedQuestions) {
-            let commQsArr = []
-            let prevCat = []
-            
-                let qArr = []
-                let randomIdx;
-                prevCat.push(categories[idx])
-                while (qArr.length < 5) {
-                    randomIdx = Math.floor(Math.random() * questions[idx].length)
-
-                    if (prevCat.includes(categories[idx])) {
-                        if (!qArr.includes(randomIdx) && !commQsArr.includes(randomIdx)) {
-                            commQsArr.push(randomIdx)
-                            qArr.push(randomIdx)
-                        }
-                    }else if (!qArr.includes(randomIdx)) {
-                        qArr.push(randomIdx)
-                    }
+        generateRandomQs: function (questions, idx, generatedQuestions) {
+            let qArr = []
+            console.log(idx)
+            let randomIdx;
+            let valueLow = 100;
+            let valueHigh = 200;
+            while (qArr.length < 5) {
+                randomIdx = Math.floor(Math.random() * questions[idx].length)
+             
+                if (!qArr.includes(randomIdx) && (questions[idx][randomIdx].value === valueLow || questions[idx][randomIdx].value === valueHigh)) {
+                    qArr.push(randomIdx)
+                    valueLow += 100
+                    valueHigh += 200
                 }
-                generatedQuestions[idx] = qArr
+            }
+            generatedQuestions[idx] = qArr
             return generatedQuestions
         },
         cleanInvalidCharQs: function (idx) {
             let tempStr = ''
-         
             for (let i = 0; i < gameVar.questions[idx].length; i++) {
                 tempStr = ''
                 for (let j = 0; j < gameVar.questions[idx][i].question.length; j++){
@@ -113,14 +106,10 @@ let GameData = (function () {
                         tempStr += gameVar.questions[idx][i].question[j]
                     }
                 }
-             
                 gameVar.questions[idx][i].question = tempStr
             }
         },
         fixFormat: function (arr, idx) {
-            // console.log('format', arr)
-            // console.log('format', idx)
-            // console.log('format', arr[idx])
             arr[idx] = arr[idx].split(' ')
             for (let i = 0; i < arr[idx].length; i++){
                 if (arr[idx][i].includes('.')) {
@@ -130,7 +119,6 @@ let GameData = (function () {
                 }
             }
             arr[idx] = arr[idx].join(' ')
-         
         },
         cleanAnsewrs: function (idx) {
             let tempStr = ''
@@ -155,7 +143,17 @@ let GameData = (function () {
                 gameVar.questions[idx][i].answer = tempStr
             }
         },
-        
+        tick: function (timer, timerInterval) {
+            timer++
+            if (timer === 0) {
+                clearInterval(timerInterval)
+            }
+            console.log(timer)
+        },
+        startTimer: function (tick,timerInterval) {
+            clearInterval(timerInterval)
+            timerInterval = setInterval(tick, 1000)
+        },
         // function to return the hard coded categories to be used by the app controller
         hardCodedCategories: function () {
             return hardCodedCategories
@@ -179,7 +177,7 @@ let GameUI = (function () {
     const cachedRef = {
         board: document.querySelector('.board'),
         categories: document.querySelectorAll('.category'),
-        questions: document.querySelectorAll('.questions'),
+        questions: document.querySelectorAll('.question'),
         players: document.querySelector('.players'),
         categorySelector: document.querySelectorAll('.select-category'),
         col0: document.querySelectorAll('.col0'),
@@ -192,16 +190,9 @@ let GameUI = (function () {
         categorySelectorContainer: document.querySelector('.category-container'),
         reset: document.getElementById('reset-btn'),
         p0Name: document.getElementById('plyr0-name'),
-        p1Name: document.getElementById('plyr1-name'),
-        p2Name: document.getElementById('plyr2-name'),
         p0btn: document.getElementById('plyr0-btn'),
-        p1btn: document.getElementById('plyr1-btn'),
-        p2btn: document.getElementById('plyr2-btn'),
         score0: document.getElementById('sp0'),
-        score1: document.getElementById('sp1'),
-        score3: document.getElementById('sp3'),
-        scores: document.querySelectorAll('score')
-        
+        time: document.getElementById('time')
     }
 
 
@@ -221,43 +212,16 @@ let GameUI = (function () {
             newOps(arr).map((el, i) => category.add(el, i))
 
         },
-        renderInit: function (idx, categoryArray, questionsData, rGQuestions) {
+        renderC: function (idx, categoryArray) {
             cachedRef.categories[idx].textContent = categoryArray[idx]
-            console.log('render', idx)
-            // if (idx == 0) {
-            //     console.log(idx)
-            //     cachedRef.col0.forEach((el, i) => {
-            //         el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
-            //     })
-            // }else if (idx == 1) {
-            //     cachedRef.col1.forEach((el, i) => {
-              
-            //         el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
-            //     })
-            // } else if (idx == 2) {
-            //     cachedRef.col2.forEach((el, i) => {
-                
-            //         el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
-            //     })
-            // }else if (idx == 3) {
-            //     cachedRef.col3.forEach((el, i) => {
-            //         el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
-            //     })
-            // }else if (idx == 4) {
-            //     cachedRef.col4.forEach((el, i) => {
-            //         el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
-            //     })
-            // }else if (idx == 5) {
-            //     cachedRef.col5.forEach((el, i) => {
-                
-            //         el.innerHTML = questionsData[idx][rGQuestions[idx][i]].question
-            //     })
-            // }
-      
         },
         renderQ: function (question, colIdx, qIdx, questions, generatedQuestions) {
+            
             question.textContent = questions[colIdx][generatedQuestions[colIdx][qIdx]].question
             
+        },
+        renderTime: function (hr, min, sec) {
+            cachedRef.time.textContent = `Time: ${hr}:${min}:${sec}`
         }
 
     }
@@ -292,9 +256,9 @@ let GameController = (function (gD, gUI) {
                 .then(data => {
                     gD.emptyData(idx)
                     data.clues.forEach(clue => {
-                        if ((clue.question.length > 3)
-                            && (!(clue.question.toLowerCase().includes('audio')) || !(clue.question.toLowerCase().includes('video')))) {
-                            gD.getQuestionsData(idx, clue.id, clue.category_id, data.title, clue.question, clue.answer, clue.invalid_count)
+                        if (clue.question.length > 3
+                           && (!clue.question.toLowerCase().includes('audio') || !clue.question.toLowerCase().includes('video'))){
+                            gD.getQuestionsData(idx, clue.id, clue.category_id, data.title, clue.question, clue.answer, clue.value)
                         }
                     })
                    
@@ -303,26 +267,55 @@ let GameController = (function (gD, gUI) {
                     gD.cleanInvalidCharQs(idx)
                     gD.cleanAnsewrs(idx)
                     gameVars.checkedCategories = gD.checkCategories(gameVars.pickedCategories)
-                    gameVars.generatedQuestions = gD.generateRandomQs(gameVars.checkedCategories, gameVars.questions, idx, gameVars.generatedQuestions)
+                    gameVars.generatedQuestions = gD.generateRandomQs(gameVars.questions, idx, gameVars.generatedQuestions)
                     gD.finalClean(gameVars.questions, idx)
                     console.log(gameVars.generatedQuestions)
-                    // console.log(gameVars.questions)
-                    // console.log(gameVars.pickedCategories)
-                    // console.log(gameVars.generatedQuestions)
-                    //console.log(gameVars.questions[idx].findIndex((el,i,arr) => arr[i].question === ""))
-                    // console.log(gameVars.questions[idx][187])
-               
-
-           
                 })
                 .then(() => {
                     gD.fixFormat(gameVars.pickedCategories, idx)
-                    gUI.renderInit(idx, gameVars.pickedCategories, gameVars.questions, gameVars.generatedQuestions)
+                    gUI.renderC(idx, gameVars.pickedCategories, gameVars.questions, gameVars.generatedQuestions)
                 })
-                // .catch(err => {
-                //     console.log(err)
-                // })
+                .catch(err => {
+                    console.log(err)
+                })
         
+    }
+
+    let timerInterval;
+    let hr, min, sec = 0;
+    let idx = 0
+    let colIdx = 0
+    let qIdx = 0;
+    let rowEnd = 25;
+
+    function tick() {
+        sec++
+        if (sec === 0) {
+            clearInterval(timerInterval)
+        }
+
+        gUI.renderTime(hr, min, sec)
+        if (sec % 10 === 0) {
+            gUI.renderQ(refs.questions[idx], colIdx, qIdx, gameVars.questions, gameVars.generatedQuestions)
+            
+            colIdx++;
+            
+            if (refs.questions[idx].id === `q${rowEnd}`) {
+                colIdx = 0
+                qIdx++
+                rowEnd++
+            }
+            idx++
+            if (sec === 300) {
+                clearInterval(timerInterval)
+                return timerInterval = null
+               }
+        }
+    }
+ 
+    function startTimer() {
+        clearInterval(timerInterval)
+        timerInterval = setInterval(tick, 100)
     }
 
     // this function runs all the event listeners 
@@ -333,22 +326,14 @@ let GameController = (function (gD, gUI) {
             gameVars.playerNames[0] = refs.p0Name.value
             console.log(gameVars.playerNames)
         }
-        refs.p1btn.onclick = (e) => {
-          
-            gameVars.playerNames[1] = refs.p1Name.value
-            console.log(gameVars.playerNames)
-        }
-        refs.p2btn.onclick = (e) => {
-         
-            gameVars.playerNames[2] = refs.p2Name.value
-            console.log(gameVars.playerNames)
-        }
+  
 
         // event listener for the game board
         refs.board.onclick = (e) => {
             let colIdx = e.target.className[3]
             let qIdx = e.target.className[5]
-            console.log(gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer)
+                // console.log(gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer)
+            console.log(e.target)
             gUI.renderQ(e.target, colIdx, qIdx, gameVars.questions, gameVars.generatedQuestions)
         }
         
@@ -364,12 +349,14 @@ let GameController = (function (gD, gUI) {
         })
 
         refs.submit.onclick = (e) => {
-            if (gameVars.pickedCategories.length === 6 && gameVars.playerNames.length === 3) {
+            if (gameVars.pickedCategories.length === 6 && gameVars.playerNames.length === 1) {
                 refs.board.style.display = ''
                 refs.categorySelectorContainer.style.display = 'none'
                 refs.reset.style.display = ''
                 refs.submit.style.display = 'none'
+                startTimer()
             }
+            
         }  
         refs.reset.onclick = (e) => {
             refs.board.style.display = 'none'
@@ -381,6 +368,9 @@ let GameController = (function (gD, gUI) {
             })
             gameVars.questions = [[], [], [], [], [], []]
             gameVars.pickedCategories = []
+            refs.questions.forEach(question => {
+                question.innerHTML = ''
+            })
         }
     }
 
@@ -391,7 +381,7 @@ let GameController = (function (gD, gUI) {
             // refs.categorySelector.forEach((category,idx) => {
             //     fetchCategory(category.value, idx )
             // })
-            refs.board.style.display = 'none'
+            refs.board.style.display = ''
             refs.reset.style.display = 'none'
             setupEvents();
         }

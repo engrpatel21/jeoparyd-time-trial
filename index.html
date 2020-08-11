@@ -13,6 +13,7 @@
   </head>
   <body>
     <h1>Hello, world!</h1>
+    <h1 id="time"></h1>
     <div class="board" id="board-space">
         <div class="category" id="c0"></div>
         <div class="category" id="c1"></div>
@@ -20,45 +21,42 @@
         <div class="category" id="c3"></div>
         <div class="category" id="c4"></div>
         <div class="category" id="c5"></div>
-        <div class="col0 0"  id="q0">100</div>
-        <div class="col1 0"  id="q5">100</div>
-        <div class="col2 0" id="q10">100</div>
-        <div class="col3 0" id="q15">100</div>
-        <div class="col4 0" id="q20">100</div>
-        <div class="col5 0" id="q25">100</div>
-        <div class="col0 1"  id="q1">200</div>
-        <div class="col1 1"  id="q6">200</div>
-        <div class="col2 1" id="q11">200</div>
-        <div class="col3 1" id="q16">200</div>
-        <div class="col4 1" id="q21">200</div>
-        <div class="col5 1" id="q26">200</div>
-        <div class="col0 2"  id="q2">300</div>
-        <div class="col1 2"  id="q7">300</div>
-        <div class="col2 2" id="q12">300</div>
-        <div class="col3 2" id="q17">300</div>
-        <div class="col4 2" id="q22">300</div>
-        <div class="col5 2" id="q27">300</div>
-        <div class="col0 3"  id="q3">400</div>
-        <div class="col1 3"  id="q8">400</div>
-        <div class="col2 3" id="q13">400</div>
-        <div class="col3 3" id="q18">400</div>
-        <div class="col4 3" id="q23">400</div>
-        <div class="col5 3" id="q28">400</div>
-        <div class="col0 4" id="q4" >500</div>
-        <div class="col1 4"  id="q9">500</div>
-        <div class="col2 4" id="q14">500</div>
-        <div class="col3 4" id="q19">500</div>
-        <div class="col4 4" id="q24">500</div>
-        <div class="col5 4" id="q29">500</div>
+        <div class="col0 0 question"  id="q0">100</div>
+        <div class="col1 0 question"  id="q5">100</div>
+        <div class="col2 0 question" id="q10">100</div>
+        <div class="col3 0 question" id="q15">100</div>
+        <div class="col4 0 question" id="q20">100</div>
+        <div class="col5 0 question" id="q25">100</div>
+        <div class="col0 1 question"  id="q1">200</div>
+        <div class="col1 1 question"  id="q6">200</div>
+        <div class="col2 1 question" id="q11">200</div>
+        <div class="col3 1 question" id="q16">200</div>
+        <div class="col4 1 question" id="q21">200</div>
+        <div class="col5 1 question" id="q26">200</div>
+        <div class="col0 2 question"  id="q2">300</div>
+        <div class="col1 2 question"  id="q7">300</div>
+        <div class="col2 2 question" id="q12">300</div>
+        <div class="col3 2 question" id="q17">300</div>
+        <div class="col4 2 question" id="q22">300</div>
+        <div class="col5 2 question" id="q27">300</div>
+        <div class="col0 3 question"  id="q3">400</div>
+        <div class="col1 3 question"  id="q8">400</div>
+        <div class="col2 3 question" id="q13">400</div>
+        <div class="col3 3 question" id="q18">400</div>
+        <div class="col4 3 question" id="q23">400</div>
+        <div class="col5 3 question" id="q28">400</div>
+        <div class="col0 4 question" id="q4" >500</div>
+        <div class="col1 4 question"  id="q9">500</div>
+        <div class="col2 4 question" id="q14">500</div>
+        <div class="col3 4 question" id="q19">500</div>
+        <div class="col4 4 question" id="q24">500</div>
+        <div class="col5 4 question" id="q29">500</div>
     </div>
     <div class="players">
         <div id='p0'><input id="plyr0-name" type="text" placeholder="Enter Player Name"> <div><button id="plyr0-btn" type="button" class="btn btn-primary">Submit</button></div></div>
-        <div id='p1'><input id="plyr1-name"type="text" placeholder="Enter Player Name"> <div><button id="plyr1-btn" type="button" class="btn btn-primary">Submit</button></div></div>
-        <div id='p2'><input id="plyr2-name" type="text" placeholder="Enter Player Name"> <div><button id="plyr2-btn" type="button" class="btn btn-primary">Submit</button></div></div>
-        <div class="score" id="sp0"><span><button type="button" class="btn btn-danger">+</button></span> 0 <span><button type="button" class="btn btn-success">+</button></span></div>
-        <div class="score" id="sp1"><span><button type="button" class="btn btn-danger">+</button></span> 0 <span><button type="button" class="btn btn-success">+</button></span></div>
-        <div class="score" id="sp2"><span><button type="button" class="btn btn-danger">+</button></span> 0 <span><button type="button" class="btn btn-success">+</button></span></div>
+        <div class="score"id="sp0"><span><button type="button" class="btn btn-danger">+</button></span> 0 <span><button type="button" class="btn btn-success">+</button></span></div>
     </div>
+
     
 
     <div class="category-container ">
@@ -79,9 +77,6 @@
     </div>
     
     
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
