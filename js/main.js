@@ -258,6 +258,20 @@ let GameUI = (function () {
                     value += 200
                 }
             }
+        },
+        animateLandingPage: function () {
+            anime({
+                targets: [cachedRef.playerNameSetting, cachedRef.difficulty, cachedRef.categorySelectorContainer, cachedRef.submit],
+                translateY: [
+                    { value: -500, duration: 0 },
+                    {value: 0, duration: 1000 }
+                    
+                ],
+                rotate: '1turn',
+                duration: 800,
+                delay: anime.stagger(500)
+              
+              });
         }
 
     }
@@ -327,30 +341,32 @@ let GameController = (function (gD, gUI) {
     let colIdx = 0
     let qIdx = 0;
     let rowEnd = 25;
+    let inputAnswerTS = 0;
 
     function tick() {
         sec++
         if (sec === 0) {
             clearInterval(timerInterval)
         }
+
+        anime({
+            targets: refs.questions[idx],
+            background: '#fff',
+        })
         gUI.renderQ(refs.questions[idx], colIdx, qIdx, gameVars.questions, gameVars.generatedQuestions)
-        gUI.renderTime(min, sec)
-        if (sec % 10 === 0) {
+      
+       
+        if (sec === inputAnswerTS + 10) {
             
             
-            colIdx++;
-            
-            if (refs.questions[idx].id === `q${rowEnd}`) {
-                colIdx = 0
-                qIdx++
-                rowEnd++
-            }
-            idx++
-            if (sec === 300) {
-                clearInterval(timerInterval)
-                return timerInterval = null
-               }
+        nextQuestion()
+         
         }
+        if (sec === 500) {
+            clearInterval(timerInterval)
+            return timerInterval = null
+        }
+        gUI.renderTime(min, sec)
     }
  
     function startTimer() {
@@ -358,14 +374,34 @@ let GameController = (function (gD, gUI) {
         timerInterval = setInterval(tick, 2000)
     }
 
+    function nextQuestion() {
+        colIdx++;
+            
+        if (refs.questions[idx].id === `q${rowEnd}`) {
+            colIdx = 0
+            qIdx++
+            rowEnd++
+        }
+        idx++
+    }
+
     function checkAnswer(colIdx, qIdx) {
         console.log('check', colIdx, qIdx)
         console.log(gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer)
-        if (refs.answer.value === gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer) {
+        if (refs.answer.value.toLowerCase() === gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer.toLowerCase()) {
             gameVars.playerScore += gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].value
             refs.score.textContent = gameVars.playerScore
             console.log('correct')
+            nextQuestion()
+            inputAnswerTS = sec
+        } else {
+            gameVars.playerScore -= gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].value
+            refs.score.textContent = gameVars.playerScore
+            nextQuestion()
+            inputAnswerTS = sec
         }
+        
+        
     }
 
     // this function runs all the event listeners 
@@ -428,13 +464,15 @@ let GameController = (function (gD, gUI) {
         })
 
         refs.submit.onclick = (e) => {
-            if (gameVars.pickedCategories.length === 6 && gameVars.playerNames.length === 1 && gameVars.difficulty !== null) {
+            if (gameVars.pickedCategories.length === 6 && gameVars.playerNames.length === 1 ) {
                 refs.board.style.display = ''
                 refs.categorySelectorContainer.style.display = 'none'
                 refs.reset.style.display = ''
                 refs.submit.style.display = 'none'
                 refs.name.textContent = gameVars.playerNames[0]
                 refs.playerNameSetting.style.display = 'none'
+                refs.difficulty.style.display = 'none'
+                refs.answerContainer.style.display = ''
                 startTimer()
             }
             
@@ -455,8 +493,9 @@ let GameController = (function (gD, gUI) {
             gameVars.score = 0
             sec = 0
             gUI.renderTime()
-            gameVars.difficulty = null
-            refs.difficultyMsg.textContent = 'Please set difficulty!'
+            gameVars.difficulty = 'Easy'
+            refs.difficulty.style.display = ''
+            refs.playerNameSetting.style.display = ''
             clearInterval(timerInterval)
             return timerInterval = null
         }
@@ -468,9 +507,10 @@ let GameController = (function (gD, gUI) {
             console.log('start')
            
             refs.difficultyMsg.textContent = `Difficulty: ${gameVars.difficulty}`
-            refs.board.style.display = ''
+            refs.board.style.display = 'none'
             refs.reset.style.display = 'none'
             refs.answerContainer.style.display = 'none'
+            gUI.animateLandingPage()
             setupEvents();
             
         }
