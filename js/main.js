@@ -16,6 +16,7 @@ let GameData = (function () {
         playerScore: 0, //player scores
         timeInterval: null,
         clock: 0,
+        difficulty: 'Easy',
         generatedQuestions: {
             0: [],
             1: [],
@@ -71,18 +72,25 @@ let GameData = (function () {
         },
 
 
-        generateRandomQs: function (questions, idx, generatedQuestions) {
+        generateRandomQs: function (questions, idx, generatedQuestions, difficulty) {
             let qArr = []
             let randomIdx;
-            let valueLow = 100;
-            let valueHigh = 200;
+            let value;
+            if (difficulty === 'Easy') {
+                value = 100
+            } else if (difficulty === 'Hard') {
+                value = 200
+            }
             while (qArr.length < 5) {
                 randomIdx = Math.floor(Math.random() * questions[idx].length)
              
-                if (!qArr.includes(randomIdx) && (questions[idx][randomIdx].value === valueLow || questions[idx][randomIdx].value === valueHigh)) {
+                if (!qArr.includes(randomIdx) && (questions[idx][randomIdx].value === value)) {
                     qArr.push(randomIdx)
-                    valueLow += 100
-                    valueHigh += 200
+                    if (difficulty === 'Easy') {
+                        value += 100
+                    } else if (difficulty === 'Hard') {
+                        value += 200
+                    }
                 }
             }
             generatedQuestions[idx] = qArr
@@ -158,6 +166,10 @@ let GameData = (function () {
             return hardCodedCategories
         },
 
+        answer: function (questions, generatedQuestions, colIdx, qIdx) {
+           return questions[colIdx][generatedQuestions[colIdx][qIdx]].answer
+        },
+
         gameVars: function () {
             return gameVar
         },
@@ -179,12 +191,6 @@ let GameUI = (function () {
         questions: document.querySelectorAll('.question'),
         players: document.querySelector('.players'),
         categorySelector: document.querySelectorAll('.select-category'),
-        col0: document.querySelectorAll('.col0'),
-        col1: document.querySelectorAll('.col1'),
-        col2: document.querySelectorAll('.col2'),
-        col3: document.querySelectorAll('.col3'),
-        col4: document.querySelectorAll('.col4'),
-        col5: document.querySelectorAll('.col5'),
         submit: document.getElementById('submit-btn'),
         categorySelectorContainer: document.querySelector('.category-container'),
         reset: document.getElementById('reset-btn'),
@@ -194,10 +200,13 @@ let GameUI = (function () {
         time: document.getElementById('time'),
         name: document.getElementById('name'),
         answer: document.getElementById('answer'), 
-        playerNameSetting: document.querySelector('.players')
+        playerNameSetting: document.querySelector('.players'),
+        answerContainer: document.querySelector('.submit-answer'),
+        difficulty: document.querySelector('.difficulty'),
+        difficultyMsg: document.getElementById('difficulty-msg')
     }
 
-
+    
     // function that creates options to be used in html select element
     function newOps(arr) {
         return arr.map(el => new Option(el[0],el[1],true,false))
@@ -223,10 +232,32 @@ let GameUI = (function () {
             
         },
 
-     
         
-        renderTime: function (hr, min, sec) {
-            cachedRef.time.textContent = `Time: ${hr}:${min}:${sec}`
+        
+        renderTime: function (min, sec) {
+            cachedRef.time.textContent = `Time: $${min}:${sec}`
+        },
+
+        renderBoard: function (difficulty) {
+            let value;
+            if (difficulty === 'Easy') {
+                value = 100
+            } else if (difficulty === 'Hard') {
+                value = 200
+            }
+            for (let i = 0; i < 5; i++){
+                cachedRef.questions.forEach(question => {
+                    if (question.className[5] == i) {
+                       
+                        question.textContent = value
+                    }
+                })
+                if (difficulty === 'Easy') {
+                    value += 100
+                } else if (difficulty === 'Hard') {
+                    value += 200
+                }
+            }
         }
 
     }
@@ -243,9 +274,12 @@ let GameController = (function (gD, gUI) {
     
     // store gameVars to be used by the app GameController 
     let gameVars = gD.gameVars()
+ 
 
     // cached references pulled from the gameUI
     const refs = gUI.refs();
+
+    
 
     // sets the options for all the select elements using the hard coded categories
     refs.categorySelector.forEach(i => gUI.addSelection(hardCodedCategories, i))
@@ -272,7 +306,7 @@ let GameController = (function (gD, gUI) {
                     gD.cleanInvalidCharQs(idx)
                     gD.cleanAnsewrs(idx)
                     gameVars.checkedCategories = gD.checkCategories(gameVars.pickedCategories)
-                    gameVars.generatedQuestions = gD.generateRandomQs(gameVars.questions, idx, gameVars.generatedQuestions)
+                    gameVars.generatedQuestions = gD.generateRandomQs(gameVars.questions, idx, gameVars.generatedQuestions, gameVars.difficulty)
                     gD.finalClean(gameVars.questions, idx)
                     console.log(gameVars.generatedQuestions)
                 })
@@ -287,7 +321,8 @@ let GameController = (function (gD, gUI) {
     }
 
     let timerInterval;
-    let hr, min, sec = 0;
+    let min = 0
+    let sec = 0;
     let idx = 0
     let colIdx = 0
     let qIdx = 0;
@@ -299,7 +334,7 @@ let GameController = (function (gD, gUI) {
             clearInterval(timerInterval)
         }
         gUI.renderQ(refs.questions[idx], colIdx, qIdx, gameVars.questions, gameVars.generatedQuestions)
-        gUI.renderTime(hr, min, sec)
+        gUI.renderTime(min, sec)
         if (sec % 10 === 0) {
             
             
@@ -329,6 +364,7 @@ let GameController = (function (gD, gUI) {
         if (refs.answer.value === gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer) {
             gameVars.playerScore += gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].value
             refs.score.textContent = gameVars.playerScore
+            console.log('correct')
         }
     }
 
@@ -340,14 +376,35 @@ let GameController = (function (gD, gUI) {
             gameVars.playerNames[0] = refs.p0Name.value
             console.log(gameVars.playerNames)
         }
-  
+        
+        refs.difficulty.onclick = (e) => {
+            if (e.target.id === 'easy') {
+                gameVars.difficulty = 'Easy'
+                gUI.renderBoard(gameVars.difficulty)
+                gameVars.pickedCategories.forEach((category, i ) => {
+                    if (category !== undefined) {
+                        gD.generateRandomQs(gameVars.questions, i, gameVars.generatedQuestions, gameVars.difficulty)
+                    }
+                })
+            } else if (e.target.id === 'hard') {
+                gameVars.difficulty = 'Hard'
+                gUI.renderBoard(gameVars.difficulty)
+                gameVars.pickedCategories.forEach((category, i ) => {
+                    if (category !== undefined) {
+                        gD.generateRandomQs(gameVars.questions, i, gameVars.generatedQuestions, gameVars.difficulty)
+                    }
+                })
+            }
+            
+            refs.difficultyMsg.textContent = `Difficulty: ${gameVars.difficulty}`
+        }
 
         // event listener for the game board
         refs.board.onclick = (e) => {
             let colIdx = e.target.className[3]
             let qIdx = e.target.className[5]
             console.log(gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer)
-           
+            //console.log(gD.answer(gameVars.questions, gameVars.generatedQuestions, colIdx, qIdx))
             gUI.renderQ(e.target, colIdx, qIdx, gameVars.questions, gameVars.generatedQuestions)
         }
         
@@ -371,7 +428,7 @@ let GameController = (function (gD, gUI) {
         })
 
         refs.submit.onclick = (e) => {
-            if (gameVars.pickedCategories.length === 6 && gameVars.playerNames.length === 1) {
+            if (gameVars.pickedCategories.length === 6 && gameVars.playerNames.length === 1 && gameVars.difficulty !== null) {
                 refs.board.style.display = ''
                 refs.categorySelectorContainer.style.display = 'none'
                 refs.reset.style.display = ''
@@ -395,6 +452,13 @@ let GameController = (function (gD, gUI) {
             refs.questions.forEach(question => {
                 question.innerHTML = ''
             })
+            gameVars.score = 0
+            sec = 0
+            gUI.renderTime()
+            gameVars.difficulty = null
+            refs.difficultyMsg.textContent = 'Please set difficulty!'
+            clearInterval(timerInterval)
+            return timerInterval = null
         }
     }
 
@@ -402,12 +466,13 @@ let GameController = (function (gD, gUI) {
         // starts the game
         init: function () {
             console.log('start')
-            // refs.categorySelector.forEach((category,idx) => {
-            //     fetchCategory(category.value, idx )
-            // })
+           
+            refs.difficultyMsg.textContent = `Difficulty: ${gameVars.difficulty}`
             refs.board.style.display = ''
             refs.reset.style.display = 'none'
+            refs.answerContainer.style.display = 'none'
             setupEvents();
+            
         }
     }
 
