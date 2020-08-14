@@ -40,6 +40,11 @@ As a user I would like to select between hard and easy questions.
 
 As a user I would like to know if I got a question right or wrong. 
 
+## Wire Frames
+
+![Imgur](https://i.imgur.com/Cg3Wqin.jpg)
+
+![Imgur](https://i.imgur.com/bmH6nHK.jpg)
 
 ## Pseudo Code
 // Data Module 
