@@ -22,11 +22,10 @@ let GameData = (function () {
             3: [],
             4: [],
             5: []
-        },
-        checkCategories: null // dead code
+        }
     }
     return {
-
+        // gets the questions from the fetch function
         getQuestionsData: function (idx, id, category_id, title, question, answer, value) {
             gameVar.questions[idx].push({
                 questionID: id,
@@ -40,6 +39,8 @@ let GameData = (function () {
            
             
         },
+
+        // empty the questions data so that new questions can be filled in and old questions get removed
         emptyData: function (idx) {
             gameVar.questions[idx] = []
         },
@@ -53,14 +54,52 @@ let GameData = (function () {
             })
             
         },
-        checkCategories: function (categories) {
-            let obj = {}
-            categories.forEach((category, idx) => {
-                if (!obj[idx] && category !== null) obj[idx] = category
-            });
-            return obj
-            
+        // cleans invalid characters from answers 
+        cleanInvalidCharAs: function (idx) {
+            let tempStr = ''
+         
+            for (let i = 0; i < gameVar.questions[idx].length; i++) {
+                tempStr = ''
+                for (let j = 0; j < gameVar.questions[idx][i].answer.length; j++){
+                    if (gameVar.questions[idx][i].answer[j] === '') {
+                        tempStr += "'"
+                    }else if (gameVar.questions[idx][i].answer[j] === '') {
+                        tempStr += '"'
+                    
+                    } else if (gameVar.questions[idx][i].answer[j] === '') {
+                        tempStr += '"'
+                    } else if (gameVar.questions[idx][i].answer[j] === '\\') { 
+                        tempStr += ''
+                    }else {
+                        tempStr += gameVar.questions[idx][i].answer[j]
+                    }
+                }
+             
+                gameVar.questions[idx][i].answer = tempStr
+            }
         },
+        // cleans invalid characters from questions
+        cleanInvalidCharQs: function (idx) {
+            let tempStr = ''
+            for (let i = 0; i < gameVar.questions[idx].length; i++) {
+                tempStr = ''
+                for (let j = 0; j < gameVar.questions[idx][i].question.length; j++){
+                    if (gameVar.questions[idx][i].question[j] === '') {
+                     
+                        tempStr += "'"
+                    }else if (gameVar.questions[idx][i].question[j] === '') {
+                        tempStr += '"'
+                    
+                    } else if (gameVar.questions[idx][i].question[j] === '') {
+                        tempStr += '"'
+                    }else {
+                        tempStr += gameVar.questions[idx][i].question[j]
+                    }
+                }
+                gameVar.questions[idx][i].question = tempStr
+            }
+        },
+        // final pass through of the data to clean it up. 
         finalClean: function (arr, idx) {
             arr[idx].forEach((el, i) => {
                 if (el.question === '') {
@@ -68,8 +107,7 @@ let GameData = (function () {
                 }
             })
         },
-
-
+        // generates random questions based on picked categories
         generateRandomQs: function (questions, idx, generatedQuestions, difficulty) {
             let qArr = []
             let randomIdx;
@@ -94,26 +132,7 @@ let GameData = (function () {
             generatedQuestions[idx] = qArr
             return generatedQuestions
         },
-        cleanInvalidCharQs: function (idx) {
-            let tempStr = ''
-            for (let i = 0; i < gameVar.questions[idx].length; i++) {
-                tempStr = ''
-                for (let j = 0; j < gameVar.questions[idx][i].question.length; j++){
-                    if (gameVar.questions[idx][i].question[j] === '') {
-                     
-                        tempStr += "'"
-                    }else if (gameVar.questions[idx][i].question[j] === '') {
-                        tempStr += '"'
-                    
-                    } else if (gameVar.questions[idx][i].question[j] === '') {
-                        tempStr += '"'
-                    }else {
-                        tempStr += gameVar.questions[idx][i].question[j]
-                    }
-                }
-                gameVar.questions[idx][i].question = tempStr
-            }
-        },
+        // fixes formating for categories to show on board, proper capitalization
         fixFormat: function (arr, idx) {
             arr[idx] = arr[idx].split(' ')
             for (let i = 0; i < arr[idx].length; i++){
@@ -125,41 +144,20 @@ let GameData = (function () {
             }
             arr[idx] = arr[idx].join(' ')
         },
-        cleanAnsewrs: function (idx) {
-            let tempStr = ''
-         
-            for (let i = 0; i < gameVar.questions[idx].length; i++) {
-                tempStr = ''
-                for (let j = 0; j < gameVar.questions[idx][i].answer.length; j++){
-                    if (gameVar.questions[idx][i].answer[j] === '') {
-                        tempStr += "'"
-                    }else if (gameVar.questions[idx][i].answer[j] === '') {
-                        tempStr += '"'
-                    
-                    } else if (gameVar.questions[idx][i].answer[j] === '') {
-                        tempStr += '"'
-                    } else if (gameVar.questions[idx][i].answer[j] === '\\') { 
-                        tempStr += ''
-                    }else {
-                        tempStr += gameVar.questions[idx][i].answer[j]
-                    }
-                }
-             
-                gameVar.questions[idx][i].answer = tempStr
-            }
-        },
+     
         // function to return the hard coded categories to be used by the app controller
         hardCodedCategories: function () {
             return hardCodedCategories
         },
-
+        // returns the answers to use in app controller
         answer: function (questions, generatedQuestions, colIdx, qIdx) {
            return questions[colIdx][generatedQuestions[colIdx][qIdx]].answer
         },
-
+        // returns the game vars to be used in app controller
         gameVars: function () {
             return gameVar
         },
+        // prints game vars for debugging purposes
         print: function () {
             console.log(gameVar.questions)
         }
@@ -176,7 +174,6 @@ let GameUI = (function () {
         board: document.querySelector('.board'),
         categories: document.querySelectorAll('.category'),
         questions: document.querySelectorAll('.question'),
-        players: document.querySelector('.players'),
         categorySelector: document.querySelectorAll('.select-category'),
         submit: document.getElementById('submit-btn'),
         categorySelectorContainer: document.querySelector('.category-container'),
@@ -196,7 +193,6 @@ let GameUI = (function () {
         nameInputShow: document.getElementById('name-input')
     }
 
-    //console.log(cachedRef.categories)
     // function that creates options to be used in html select element
     function newOps(arr) {
         return arr.map(el => new Option(el[0],el[1],true,false))
@@ -213,25 +209,29 @@ let GameUI = (function () {
             newOps(arr).map((el, i) => category.add(el, i))
 
         },
+
+        // renders the categories to display on board
         renderC: function (idx, categoryArray) {
             cachedRef.categories[idx].textContent = categoryArray[idx]
         },
+        // renders questions for the game board
         renderQ: function (question, colIdx, qIdx, questions, generatedQuestions) {
             question.style.fontSize = '1rem'
             question.textContent = questions[colIdx][generatedQuestions[colIdx][qIdx]].question
             
         },
-
-        
-        
-        renderTime: function (min, sec) {
+        // renders the game time
+        renderTime: function ( sec) {
             cachedRef.time.textContent = `Time: ${sec}`
         },
+        // renders the end of the game
         renderGameEnd: function (score) {
             cachedRef.board.style.display = 'none'
             cachedRef.answerContainer.style.display = 'none'
             cachedRef.gameEnd.textContent = `Congradulations! Your Score is: ${score}`
         },
+
+        // renders the board and questions/scores based on difficulty
         renderBoard: function (difficulty) {
             let value;
             if (difficulty === 'Easy') {
@@ -253,12 +253,14 @@ let GameUI = (function () {
                 }
             }
         },
+
+        // animates the landing page
         animateLandingPage: function () {
             anime({
                 targets: [cachedRef.playerNameSetting, cachedRef.difficulty, cachedRef.categorySelectorContainer, cachedRef.submit],
                 translateY: [
-                    { value: -500, duration: 0 },
-                    {value: 0, duration: 1000 }
+                    { value: -1000, duration: 0 },
+                    {value: 0, duration: 1500 }
                     
                 ],
                 rotate: '1turn',
@@ -267,6 +269,7 @@ let GameUI = (function () {
               
               });
         },
+        // enlarges each individual question to be visible
         enlargeQ: function (idx, colIdx, qIdx) {
             
             if (colIdx == 0 && qIdx == 0) {
@@ -510,6 +513,7 @@ let GameUI = (function () {
             
             
         },
+        // shrinks the questions
         shringQ: function (idx) {
             anime({
                 targets: cachedRef.questions[idx],
@@ -545,6 +549,7 @@ let GameController = (function (gD, gUI) {
     const correct = new Audio('audio/yes.mp3')
     const wrong = new Audio('audio/wrong.mp3')
     const gameMusic = new Audio('audio/gamemusic.mp3')
+    const congratz = new Audio('audio/congratz.mp3')
     
 
     // sets the options for all the select elements using the hard coded categories
@@ -561,6 +566,7 @@ let GameController = (function (gD, gUI) {
                 .then(data => {
                     gD.emptyData(idx)
                     data.clues.forEach(clue => {
+                        //initial pass through the data to delete blank questions and audio/video questions
                         if (clue.question.length > 1
                            && (!clue.question.toLowerCase().includes('audio') || !clue.question.toLowerCase().includes('video'))){
                             gD.getQuestionsData(idx, clue.id, clue.category_id, data.title, clue.question, clue.answer, clue.value)
@@ -570,13 +576,9 @@ let GameController = (function (gD, gUI) {
                     gD.cleanQuestions(idx, ')')
                     gD.cleanQuestions(idx, ']')
                     gD.cleanInvalidCharQs(idx)
-                    gD.cleanAnsewrs(idx)
-                    gameVars.checkedCategories = gD.checkCategories(gameVars.pickedCategories)
-                    gameVars.generatedQuestions = gD.generateRandomQs(gameVars.questions, idx, gameVars.generatedQuestions, gameVars.difficulty)
+                    gD.cleanInvalidCharAs(idx)
                     gD.finalClean(gameVars.questions, idx)
-                    console.log(gameVars.generatedQuestions)
-                })
-                .then(() => {
+                    gameVars.generatedQuestions = gD.generateRandomQs(gameVars.questions, idx, gameVars.generatedQuestions, gameVars.difficulty)
                     gD.fixFormat(gameVars.pickedCategories, idx)
                     gUI.renderC(idx, gameVars.pickedCategories, gameVars.questions, gameVars.generatedQuestions)
                 })
@@ -585,9 +587,8 @@ let GameController = (function (gD, gUI) {
                 })
         
     }
-
+    // variables to keep track of time and question being asked
     let timerInterval;
-    let min = 0;
     let sec = 0;
     let idx = 0
     let colIdx = 0
@@ -599,11 +600,12 @@ let GameController = (function (gD, gUI) {
         sec++
         if (sec === 500 || idx === 30) {
             console.log(true)
+            congratz.play()
             gUI.renderGameEnd(gameVars.playerScore)
             clearInterval(timerInterval)
             return timerInterval = null
         }
-        gUI.renderTime(min, sec)
+        gUI.renderTime(sec)
         if (sec === 0) {
             clearInterval(timerInterval)
         }
@@ -660,18 +662,22 @@ let GameController = (function (gD, gUI) {
     // this function runs all the event listeners 
     function setupEvents() {
 
+        // plays sound when clicking on the page
         refs.body.onclick = () => {
-            console.log(gameMusic)
             gameMusic.volume = 0.25
+            countDown.volume = .25
+            wrong.volume = .25
+            correct.volume = .25
             gameMusic.play()
         }
 
+        // submits player name
         refs.p0btn.onclick = (e) => {
             gameVars.playerNames[0] = refs.p0Name.value
             refs.nameInputShow.textContent = `Name: ${gameVars.playerNames[0]}`
            
         }
-        
+        // toggles the difficulty of the game
         refs.difficulty.onclick = (e) => {
             if (e.target.id === 'easy') {
                 gameVars.difficulty = 'Easy'
@@ -694,7 +700,7 @@ let GameController = (function (gD, gUI) {
             refs.difficultyMsg.textContent = `Difficulty: ${gameVars.difficulty}`
         }
 
-        // event listener for the game board
+        // event listener for the game board - debuging to see answers
         refs.board.onclick = (e) => {
             let colIdx = e.target.className[3]
             let qIdx = e.target.className[5]
@@ -705,8 +711,6 @@ let GameController = (function (gD, gUI) {
         
         // event listener for selecting categories 
         refs.categorySelector.forEach(category => category.onclick = (e) => {
-            
-      
             // fetches data from the api depending on the user selected category
             if (e.target.value != -1) { 
                 fetchCategory(e.target.value, e.target.id[3])
@@ -715,14 +719,15 @@ let GameController = (function (gD, gUI) {
            
         })
 
+        // checks the inputed answer
         refs.answer.addEventListener('keypress', (e) => {
             if(event.key === 13 || event.which == 13){
-                console.log('col', colIdx,'q', qIdx,'nodelist', idx)
                 checkAnswer(colIdx,qIdx, idx)
                 e.target.value = ''
             }
         })
 
+        // starts the game - waits for the countdown to finsh before game begins
         refs.submit.onclick = (e) => {
             if (gameVars.pickedCategories.length === 6 && gameVars.playerNames.length === 1 ) {
                 refs.board.style.display = ''
@@ -733,9 +738,7 @@ let GameController = (function (gD, gUI) {
                 refs.playerNameSetting.style.display = 'none'
                 refs.difficulty.style.display = 'none'
                 refs.answerContainer.style.display = ''
-                gUI.renderTime(min, sec)
-                console.log(gameVars.questions)
-                console.log(gameVars.generatedQuestions)
+                gUI.renderTime(sec)
                 countDown.play()
                 setTimeout(startTimer, 4400)
                 
@@ -743,6 +746,7 @@ let GameController = (function (gD, gUI) {
             }
             
         }  
+        //resets the game 
         refs.reset.onclick = (e) => {
             document.location.reload();
         }
@@ -752,12 +756,10 @@ let GameController = (function (gD, gUI) {
         // starts the game
         init: function () {
             console.log('start')
-           
             refs.difficultyMsg.textContent = `Difficulty: ${gameVars.difficulty}`
             refs.board.style.display = 'none'
             refs.reset.style.display = 'none'
             refs.answerContainer.style.display = 'none'
-           
             gUI.animateLandingPage()
             setupEvents()
             
