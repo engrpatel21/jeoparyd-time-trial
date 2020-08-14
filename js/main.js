@@ -599,7 +599,6 @@ let GameController = (function (gD, gUI) {
     function tick() {
         sec++
         if (sec === 500 || idx === 30) {
-            console.log(true)
             congratz.play()
             gUI.renderGameEnd(gameVars.playerScore)
             clearInterval(timerInterval)
@@ -614,7 +613,7 @@ let GameController = (function (gD, gUI) {
         gUI.renderQ(refs.questions[idx], colIdx, qIdx, gameVars.questions, gameVars.generatedQuestions)
       
        
-        if (sec === inputAnswerTS + 10) {
+        if (sec === inputAnswerTS + 20) {
             checkAnswer(colIdx, qIdx, idx)
          
         }
