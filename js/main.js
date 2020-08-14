@@ -12,10 +12,8 @@ let GameData = (function () {
     let gameVar = {
         pickedCategories: [], //categories that were picked
         questions: [[],[],[],[],[],[]],//each nested array represents 1 of 6 categories to choose from
-        playerNames: [], // player names
+        playerNames: [''], // player names
         playerScore: 0, //player scores
-        timeInterval: null,
-        clock: 0,
         difficulty: 'Easy',
         generatedQuestions: {
             0: [],
@@ -25,7 +23,7 @@ let GameData = (function () {
             4: [],
             5: []
         },
-        checkCategories: null
+        checkCategories: null // dead code
     }
     return {
 
@@ -86,9 +84,9 @@ let GameData = (function () {
              
                 if (!qArr.includes(randomIdx) && (questions[idx][randomIdx].value === value)) {
                     qArr.push(randomIdx)
-                    if (difficulty === 'Easy') {
+                    if (difficulty === 'Easy' ) {
                         value += 100
-                    } else if (difficulty === 'Hard') {
+                    } else if (difficulty === 'Hard' ) {
                         value += 200
                     }
                 }
@@ -150,17 +148,6 @@ let GameData = (function () {
                 gameVar.questions[idx][i].answer = tempStr
             }
         },
-        tick: function (timer, timerInterval) {
-            timer++
-            if (timer === 0) {
-                clearInterval(timerInterval)
-            }
-            console.log(timer)
-        },
-        startTimer: function (tick,timerInterval) {
-            clearInterval(timerInterval)
-            timerInterval = setInterval(tick, 1000)
-        },
         // function to return the hard coded categories to be used by the app controller
         hardCodedCategories: function () {
             return hardCodedCategories
@@ -203,10 +190,13 @@ let GameUI = (function () {
         playerNameSetting: document.querySelector('.players'),
         answerContainer: document.querySelector('.submit-answer'),
         difficulty: document.querySelector('.difficulty'),
-        difficultyMsg: document.getElementById('difficulty-msg')
+        difficultyMsg: document.getElementById('difficulty-msg'),
+        gameEnd: document.getElementById('game-end'),
+        body: document.querySelector('body'),
+        nameInputShow: document.getElementById('name-input')
     }
 
-    
+    //console.log(cachedRef.categories)
     // function that creates options to be used in html select element
     function newOps(arr) {
         return arr.map(el => new Option(el[0],el[1],true,false))
@@ -227,7 +217,7 @@ let GameUI = (function () {
             cachedRef.categories[idx].textContent = categoryArray[idx]
         },
         renderQ: function (question, colIdx, qIdx, questions, generatedQuestions) {
-            
+            question.style.fontSize = '1rem'
             question.textContent = questions[colIdx][generatedQuestions[colIdx][qIdx]].question
             
         },
@@ -235,9 +225,13 @@ let GameUI = (function () {
         
         
         renderTime: function (min, sec) {
-            cachedRef.time.textContent = `Time: $${min}:${sec}`
+            cachedRef.time.textContent = `Time: ${sec}`
         },
-
+        renderGameEnd: function (score) {
+            cachedRef.board.style.display = 'none'
+            cachedRef.answerContainer.style.display = 'none'
+            cachedRef.gameEnd.textContent = `Congradulations! Your Score is: ${score}`
+        },
         renderBoard: function (difficulty) {
             let value;
             if (difficulty === 'Easy') {
@@ -272,7 +266,259 @@ let GameUI = (function () {
                 delay: anime.stagger(500)
               
               });
+        },
+        enlargeQ: function (idx, colIdx, qIdx) {
+            
+            if (colIdx == 0 && qIdx == 0) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: 56, duration: 500 }],
+                    translateX: [{ value: 250, duration: 500 }]
+                })
+            }
+            if (colIdx == 1 && qIdx == 0) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: 56, duration: 500 }],
+                    translateX: [{ value: 150, duration: 500 }]
+                })
+            }
+            if (colIdx == 2 && qIdx == 0) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: 56, duration: 500 }],
+                    translateX: [{ value: 50, duration: 500 }]
+                })
+            }  if (colIdx == 3 && qIdx == 0) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: 56, duration: 500 }],
+                    translateX: [{ value: -50, duration: 500 }]
+                })
+            }if (colIdx == 4 && qIdx == 0) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: 56, duration: 500 }],
+                    translateX: [{ value: -150, duration: 500 }]
+                })
+            }if (colIdx == 5 && qIdx == 0) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: 56, duration: 500 }],
+                    translateX: [{ value: -250, duration: 500 }]
+                })
+            }if (colIdx == 0 && qIdx == 1) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: 19, duration: 500 }],
+                    translateX: [{ value: 250, duration: 500 }]
+                })
+            }if (colIdx == 1 && qIdx == 1) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: 19, duration: 500 }],
+                    translateX: [{ value: 150, duration: 500 }]
+                })
+            }if (colIdx == 2 && qIdx == 1) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: 19, duration: 500 }],
+                    translateX: [{ value: 50, duration: 500 }]
+                })
+            }if (colIdx == 3 && qIdx == 1) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: 19, duration: 500 }],
+                    translateX: [{ value: -50, duration: 500 }]
+                })
+            }if (colIdx == 4 && qIdx == 1) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: 19, duration: 500 }],
+                    translateX: [{ value: -150, duration: 500 }]
+                })
+            }if (colIdx == 5 && qIdx == 1) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: 19, duration: 500 }],
+                    translateX: [{ value: -250, duration: 500 }]
+                })
+            }if (colIdx == 0 && qIdx == 2) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateX: [{ value: 250, duration: 500 }]
+                })
+            }if (colIdx == 1 && qIdx == 2) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateX: [{ value: 150, duration: 500 }]
+                })
+            }if (colIdx == 2 && qIdx == 2) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateX: [{ value: 50, duration: 500 }]
+                })
+            }if (colIdx == 3 && qIdx == 2) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateX: [{ value: -50, duration: 500 }]
+                })
+            }if (colIdx == 4 && qIdx == 2) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateX: [{ value: -150, duration: 500 }]
+                })
+            }if (colIdx == 5 && qIdx == 2) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateX: [{ value: -250, duration: 500 }]
+                })
+            }if (colIdx == 0 && qIdx == 3) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: -19, duration: 500 }],
+                    translateX: [{ value: 250, duration: 500 }]
+                })
+            }if (colIdx == 1 && qIdx == 3) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: -19, duration: 500 }],
+                    translateX: [{ value: 150, duration: 500 }]
+                })
+            }if (colIdx == 2 && qIdx == 3) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: -19, duration: 500 }],
+                    translateX: [{ value: 50, duration: 500 }]
+                })
+            }if (colIdx == 3 && qIdx == 3) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: -19, duration: 500 }],
+                    translateX: [{ value: -50, duration: 500 }]
+                })
+            }if (colIdx == 4 && qIdx == 3) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: -19, duration: 500 }],
+                    translateX: [{ value: -150, duration: 500 }]
+                })
+            }if (colIdx == 5 && qIdx == 3) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: -19, duration: 500 }],
+                    translateX: [{ value: -250, duration: 500 }]
+                })
+            }if (colIdx == 0 && qIdx == 4) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: -56, duration: 500 }],
+                    translateX: [{ value: 250, duration: 500 }]
+                })
+            }if (colIdx == 1 && qIdx == 4) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: -56, duration: 500 }],
+                    translateX: [{ value: 150, duration: 500 }]
+                })
+            }if (colIdx == 2 && qIdx == 4) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: -56, duration: 500 }],
+                    translateX: [{ value: 50, duration: 500 }]
+                })
+            }if (colIdx == 3 && qIdx == 4) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: -56, duration: 500 }],
+                    translateX: [{ value: -50, duration: 500 }]
+                })
+            }if (colIdx == 4 && qIdx == 4) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: -56, duration: 500 }],
+                    translateX: [{ value: -150, duration: 500 }]
+                })
+            }if (colIdx == 5 && qIdx == 4) {
+                anime({
+                    targets: cachedRef.questions[idx],
+                    background: '#060CE9',
+                    scale: 2,
+                    translateY: [{ value: -56, duration: 500 }],
+                    translateX: [{ value: -250, duration: 500 }]
+                })
+            }
+            
+            
+            
+        },
+        shringQ: function (idx) {
+            anime({
+                targets: cachedRef.questions[idx],
+                scale: 1,
+                translateY: [{ value: 0, duration: 500 }],
+                translateX: [{ value: 0, duration: 500 }]
+            })
         }
+
 
     }
 
@@ -294,6 +540,12 @@ let GameController = (function (gD, gUI) {
     const refs = gUI.refs();
 
     
+    //sound
+    const countDown = new Audio('audio/count-down.mp3')
+    const correct = new Audio('audio/yes.mp3')
+    const wrong = new Audio('audio/wrong.mp3')
+    const gameMusic = new Audio('audio/gamemusic.mp3')
+    
 
     // sets the options for all the select elements using the hard coded categories
     refs.categorySelector.forEach(i => gUI.addSelection(hardCodedCategories, i))
@@ -309,7 +561,7 @@ let GameController = (function (gD, gUI) {
                 .then(data => {
                     gD.emptyData(idx)
                     data.clues.forEach(clue => {
-                        if (clue.question.length > 3
+                        if (clue.question.length > 1
                            && (!clue.question.toLowerCase().includes('audio') || !clue.question.toLowerCase().includes('video'))){
                             gD.getQuestionsData(idx, clue.id, clue.category_id, data.title, clue.question, clue.answer, clue.value)
                         }
@@ -335,7 +587,7 @@ let GameController = (function (gD, gUI) {
     }
 
     let timerInterval;
-    let min = 0
+    let min = 0;
     let sec = 0;
     let idx = 0
     let colIdx = 0
@@ -345,38 +597,36 @@ let GameController = (function (gD, gUI) {
 
     function tick() {
         sec++
-        if (sec === 0) {
-            clearInterval(timerInterval)
-        }
-
-        anime({
-            targets: refs.questions[idx],
-            background: '#fff',
-        })
-        gUI.renderQ(refs.questions[idx], colIdx, qIdx, gameVars.questions, gameVars.generatedQuestions)
-      
-       
-        if (sec === inputAnswerTS + 10) {
-            
-            
-        nextQuestion()
-         
-        }
-        if (sec === 500) {
+        if (sec === 500 || idx === 30) {
+            console.log(true)
+            gUI.renderGameEnd(gameVars.playerScore)
             clearInterval(timerInterval)
             return timerInterval = null
         }
         gUI.renderTime(min, sec)
+        if (sec === 0) {
+            clearInterval(timerInterval)
+        }
+
+        gUI.enlargeQ(idx, colIdx, qIdx)
+        gUI.renderQ(refs.questions[idx], colIdx, qIdx, gameVars.questions, gameVars.generatedQuestions)
+      
+       
+        if (sec === inputAnswerTS + 10) {
+            checkAnswer(colIdx, qIdx, idx)
+         
+        }
+        
     }
  
     function startTimer() {
         clearInterval(timerInterval)
-        timerInterval = setInterval(tick, 2000)
+        timerInterval = setInterval(tick, 1000)
     }
 
     function nextQuestion() {
         colIdx++;
-            
+        refs.questions[idx].style.fontSize = '3rem'  
         if (refs.questions[idx].id === `q${rowEnd}`) {
             colIdx = 0
             qIdx++
@@ -385,18 +635,21 @@ let GameController = (function (gD, gUI) {
         idx++
     }
 
-    function checkAnswer(colIdx, qIdx) {
-        console.log('check', colIdx, qIdx)
-        console.log(gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer)
+    function checkAnswer(colIdx, qIdx, idx) {
         if (refs.answer.value.toLowerCase() === gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer.toLowerCase()) {
+            correct.play()
             gameVars.playerScore += gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].value
-            refs.score.textContent = gameVars.playerScore
-            console.log('correct')
+            refs.score.textContent = `Score: ${gameVars.playerScore}`
+            gUI.shringQ(idx)
+            refs.questions[idx].textContent =`Score: +${gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].value}`
             nextQuestion()
             inputAnswerTS = sec
         } else {
+            wrong.play()
             gameVars.playerScore -= gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].value
-            refs.score.textContent = gameVars.playerScore
+            refs.score.textContent = `Score: ${gameVars.playerScore}`
+            refs.questions[idx].textContent =`Score: -${gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].value}`
+            gUI.shringQ(idx)
             nextQuestion()
             inputAnswerTS = sec
         }
@@ -407,10 +660,16 @@ let GameController = (function (gD, gUI) {
     // this function runs all the event listeners 
     function setupEvents() {
 
+        refs.body.onclick = () => {
+            console.log(gameMusic)
+            gameMusic.volume = 0.25
+            gameMusic.play()
+        }
+
         refs.p0btn.onclick = (e) => {
-        
             gameVars.playerNames[0] = refs.p0Name.value
-            console.log(gameVars.playerNames)
+            refs.nameInputShow.textContent = `Name: ${gameVars.playerNames[0]}`
+           
         }
         
         refs.difficulty.onclick = (e) => {
@@ -440,8 +699,8 @@ let GameController = (function (gD, gUI) {
             let colIdx = e.target.className[3]
             let qIdx = e.target.className[5]
             console.log(gameVars.questions[colIdx][gameVars.generatedQuestions[colIdx][qIdx]].answer)
-            //console.log(gD.answer(gameVars.questions, gameVars.generatedQuestions, colIdx, qIdx))
-            gUI.renderQ(e.target, colIdx, qIdx, gameVars.questions, gameVars.generatedQuestions)
+            
+            
         }
         
         // event listener for selecting categories 
@@ -452,13 +711,14 @@ let GameController = (function (gD, gUI) {
             if (e.target.value != -1) { 
                 fetchCategory(e.target.value, e.target.id[3])
             }
+          
            
         })
 
         refs.answer.addEventListener('keypress', (e) => {
             if(event.key === 13 || event.which == 13){
-                console.log(e.target.value)
-                checkAnswer(colIdx,qIdx)
+                console.log('col', colIdx,'q', qIdx,'nodelist', idx)
+                checkAnswer(colIdx,qIdx, idx)
                 e.target.value = ''
             }
         })
@@ -469,35 +729,22 @@ let GameController = (function (gD, gUI) {
                 refs.categorySelectorContainer.style.display = 'none'
                 refs.reset.style.display = ''
                 refs.submit.style.display = 'none'
-                refs.name.textContent = gameVars.playerNames[0]
+                refs.name.textContent = `Name: ${gameVars.playerNames[0]}`
                 refs.playerNameSetting.style.display = 'none'
                 refs.difficulty.style.display = 'none'
                 refs.answerContainer.style.display = ''
-                startTimer()
+                gUI.renderTime(min, sec)
+                console.log(gameVars.questions)
+                console.log(gameVars.generatedQuestions)
+                countDown.play()
+                setTimeout(startTimer, 4400)
+                
+                
             }
             
         }  
         refs.reset.onclick = (e) => {
-            refs.board.style.display = 'none'
-            refs.categorySelectorContainer.style.display = ''
-            refs.submit.style.display = ''
-            refs.reset.style.display = 'none'
-            refs.categorySelector.forEach(category => {
-                category.selectedIndex = 0
-            })
-            gameVars.questions = [[], [], [], [], [], []]
-            gameVars.pickedCategories = []
-            refs.questions.forEach(question => {
-                question.innerHTML = ''
-            })
-            gameVars.score = 0
-            sec = 0
-            gUI.renderTime()
-            gameVars.difficulty = 'Easy'
-            refs.difficulty.style.display = ''
-            refs.playerNameSetting.style.display = ''
-            clearInterval(timerInterval)
-            return timerInterval = null
+            document.location.reload();
         }
     }
 
@@ -510,8 +757,9 @@ let GameController = (function (gD, gUI) {
             refs.board.style.display = 'none'
             refs.reset.style.display = 'none'
             refs.answerContainer.style.display = 'none'
+           
             gUI.animateLandingPage()
-            setupEvents();
+            setupEvents()
             
         }
     }
