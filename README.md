@@ -53,40 +53,40 @@ As a user I would like to know if I got a question right or wrong.
 // Data Module 
 
 // game variables
-player name
-player points
-question points
-timer
-cateogories 
-clues
-answers
+* player name
+* player points
+* question points
+* timer
+* cateogories 
+* clues
+* answers
 
 // data moduel methods
-calculate player points based on right/wrong answers
-host awards points
-remove picked questions from data structure
+* calculate player points based on right/wrong answers
+* host awards points
+* remove picked questions from data structure
 // api calls 
-categories
-clues 
-answers
+* categories
+* clues 
+* answers
 
 ----------------------------------------------------------------------------
 
 //UI Module
 
 // UI variables
-cached element references
+* cached element references
 
 // ui controller methods
-change scores
-change player names
-delete out questions
-populate questions
-populate clues
-populate answers
-show timer
-ability to bet (daily double)
-creating new options for selecting categories 
+*change scores
+*change player names
+*delete out questions
+*populate questions
+*populate clues
+*populate answers
+*show timer
+*ability to bet (daily double)
+*creating new options for selecting categories 
 
 
 //sound controller?
@@ -95,14 +95,14 @@ creating new options for selecting categories
 ----------------------------------------------------------------------------------
 
 // App controller
-event listenrs for question picking
+* event listenrs for question picking
 
-collect data info from data controller to populate game board with ui module methods
-collect inputs ui and update data with data module methods
+* collect data info from data controller to populate game board * with ui module methods
+* collect inputs ui and update data with data module methods
 
-reset game
+* reset game
 
-game initialization
+* game initialization
 
 ## Stretch Goals
 * Better Animations
