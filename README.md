@@ -18,7 +18,7 @@ The difficulty setting sets the the difficulty of the board, easy difficulty set
 Once the game starts players will see the question to answer pop out from the board and will have 10 seconds to answer the question correctly. If they guess correctly, they will recieve the points, if incorrect, the points will be deducted from their total score. The game ends when all questions have been answered or the time runs out. 
 
 ### Play the game here
-[Jeopardy-Game](jeopardy-time-trial.surge.sh)
+[Jeopardy-Game](http://jeopardy-time-trial.surge.sh/)
 
 ## Technolgies Used
 
